@@ -1,5 +1,7 @@
 import { Fragment, useState } from "react";
 
+
+
 export default function Home() {
   const [headers, setHeaders] = useState(null);
   const [values, setValues] = useState(null);
@@ -31,9 +33,9 @@ export default function Home() {
   };
 
   const handlePost = async () => {
-
     const newValues = values.map((item, ind) => {
       if (ind === 0) {
+        // if it's date
         let dt = new Date(Date.parse(item));
         dt.setDate(dt.getDate() + 1);
         item = dt.toDateString().split(" ").slice(1).join(" ");
@@ -73,27 +75,44 @@ export default function Home() {
         className="bg-sky-600 hover:bg-sky-700 px-5 py-3 text-white rounded-lg"
         onClick={() => handleClick()}
       >
-        get rows
+        Get last workout
       </button>
       {fetched ? (
         <Fragment>
           {headers.map((item, ind) => {
-            return (
-              <div className="flex flex-row">
-                <div className="bg-sky-300 w-32 text-center px-5 py-3 m-1 text-darkgrey rounded-lg">
-                  {item}
+            if (ind > 0) {
+              return (
+                <div className="flex flex-row" key={ind}>
+                  <div className="bg-sky-300 w-32 text-center px-5 py-3 m-1 text-darkgrey rounded-lg">
+                    {item}
+                  </div>
+                  <input
+                    type="number"
+                    value={values[ind]}
+                    className="bg-sky-700 hover:bg-sky-900 w-32 text-center px-5 py-3 m-1 text-white rounded-lg"
+                  />
                 </div>
-                <button className="bg-sky-700 hover:bg-sky-900 w-32 text-center px-5 py-3 m-1 text-white rounded-lg">
-                  {values[ind]}
-                </button>
-              </div>
-            );
+              );
+            } else {
+              return (
+                <div className="flex flex-row" key={ind}>
+                  <div className="bg-sky-300 w-32 text-center px-5 py-3 m-1 text-darkgrey rounded-lg">
+                    {item}
+                  </div>
+                  <input
+                    type="text"
+                    value={values[ind]}
+                    className="bg-sky-700 hover:bg-sky-900 w-32 text-center px-5 py-3 m-1 text-white rounded-lg"
+                  />
+                </div>
+              );
+            }
           })}
           <button
             className="bg-sky-600 hover:bg-sky-700 px-5 py-3 text-white rounded-lg"
             onClick={() => handlePost()}
           >
-            +1 and POST
+            Add new Workout
           </button>
         </Fragment>
       ) : null}

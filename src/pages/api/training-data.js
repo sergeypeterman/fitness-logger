@@ -21,8 +21,6 @@ export default async function handler(req, res) {
 
     await sheet.loadCells();
 
-    const DAY = 1000*60*60*24;
-
     //if fetching with post == true , update the sheet
     if(post){
       values.map((item, ind)=>{
