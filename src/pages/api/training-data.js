@@ -3,8 +3,6 @@ const sheetId = process.env.GOOGLE_SHEET_ID;
 const doc = new GoogleSpreadsheet(sheetId);
 
 export default async function handler(req, res) {
-  const {query: {post}, 
-        } = req;
 
   try
   {
@@ -14,15 +12,16 @@ export default async function handler(req, res) {
     });
 
     await doc.loadInfo(); // loads document properties and worksheets
-    const title = doc.title;
     const sheet = doc.sheetsByIndex[0]; 
     let rows = await sheet.getRows(); //getting rows
     let values = rows[0]._rawData; //getting values
 
     await sheet.loadCells();
-
     //if fetching with post == true , update the sheet
-    if(post){
+    if(req.method === 'POST'){
+      console.log(`BODY TYPE: ${typeof req.body}: ${req.body}`);
+
+      values = [...req.body];
       values.map((item, ind)=>{
         sheet.getCell(1,ind).value = item;
       });
