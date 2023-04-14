@@ -40,7 +40,7 @@ function Settings({ workout, updateWorkout, isActive }) {
 
   const setRep = workout.reps.split("x"); //extracting sets and reps to an array
   const buttonStyle = isActive
-    ? "w-32 text-center px-5 py-3 m-1 text-black rounded-lg text-lg bg-gray-300"
+    ? "text-center px-5 py-3 m-1 text-black rounded-lg text-lg bg-gray-300"
     : BUTTONSTYLE;
   const tagStyle = isActive
     ? "bg-gray-300 w-36 text-center px-5 py-3 m-1 text-black rounded-lg font-display text-lg"
