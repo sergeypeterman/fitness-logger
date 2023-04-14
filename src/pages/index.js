@@ -71,14 +71,14 @@ function Settings({ workout, updateWorkout, isActive }) {
         <div className={`${tagStyle} mr-2`}>Reps</div>
         <div className="flex flex-row justify-between w-52">
           <input
-            className={`${buttonStyle}  w-24 ml-0`}
+            className={`${buttonStyle}  w-1/2 ml-0`}
             type="number"
             value={setRep[0]}
             onChange={handleSets}
             disabled={isActive}
           />
           <input
-            className={`${buttonStyle}  w-24 mr-0`}
+            className={`${buttonStyle}  w-1/2 mr-0`}
             type="number"
             value={setRep[1]}
             onChange={handleReps}
@@ -119,7 +119,7 @@ class trainingRecord {
 const TAGSTYLE =
   "bg-sky-300 w-36 text-center px-5 py-3 m-1 text-black rounded-lg font-display text-lg";
 const BUTTONSTYLE =
-  "bg-sky-700 w-32 hover:bg-sky-900 text-center px-5 py-3 m-1 text-white rounded-lg text-lg";
+  "bg-sky-700 hover:bg-sky-900 text-center px-5 py-3 m-1 text-white rounded-lg text-lg";
 
 const today = new Date().toLocaleDateString("fr-ca");
 const initialWorkout = new trainingRecord(-1, today, "2x15", 120, []);
@@ -264,7 +264,7 @@ export default function Home() {
                   <input
                     type="number"
                     value={item.workload}
-                    className={BUTTONSTYLE}
+                    className={`${BUTTONSTYLE}  w-32 mr-0`}
                     onChange={(e) => handleExercise(ind, e)}
                   />
                 </div>
