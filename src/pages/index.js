@@ -1,6 +1,6 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useState } from "react";
 
-function Settings({ workout, updateWorkout }) {
+function Settings({ workout, updateWorkout, isActive }) {
   // component for setting the date and reps, input is disabled when it's used inside a new workout
 
   const handleDate = (event) => {
@@ -13,6 +13,7 @@ function Settings({ workout, updateWorkout }) {
   };
 
   const handleReps = (event) => {
+    //handling reps part of Reps input
     let newW = { ...workout };
     let newReps = event.target.value;
     let newRepsArr = newW.reps.split("x");
@@ -25,6 +26,7 @@ function Settings({ workout, updateWorkout }) {
   };
 
   const handleSets = (event) => {
+    //handling sets part of Reps input
     let newW = { ...workout };
     let newSets = event.target.value;
     let newRepsArr = newW.reps.split("x");
@@ -36,7 +38,13 @@ function Settings({ workout, updateWorkout }) {
     updateWorkout(newW);
   };
 
-  const setRep = workout.reps.split("x");
+  const setRep = workout.reps.split("x"); //extracting sets and reps to an array
+  const buttonStyle = isActive
+    ? "w-32 text-center px-5 py-3 m-1 text-black rounded-lg text-lg bg-gray-300"
+    : BUTTONSTYLE;
+  const tagStyle = isActive
+    ? "bg-gray-300 w-36 text-center px-5 py-3 m-1 text-black rounded-lg font-display text-lg"
+    : TAGSTYLE;
 
   const handleRest = (event) => {
     //handling date input
@@ -50,38 +58,42 @@ function Settings({ workout, updateWorkout }) {
   return (
     <div>
       <div className="flex flex-row">
-        <div className={TAGSTYLE}>Date</div>
+        <div className={tagStyle}>Date</div>
         <input
           type="date"
           onChange={handleDate}
           value={workout.date}
-          className={`${BUTTONSTYLE} w-52 `}
+          className={`${buttonStyle} w-52 `}
+          disabled={isActive}
         />
       </div>
       <div className="flex flex-row">
-        <div className={`${TAGSTYLE} mr-2`}>Reps</div>
+        <div className={`${tagStyle} mr-2`}>Reps</div>
         <div className="flex flex-row justify-between w-52">
           <input
-            className={`${BUTTONSTYLE}  w-1/2 ml-0`}
+            className={`${buttonStyle}  w-24 ml-0`}
             type="number"
             value={setRep[0]}
             onChange={handleSets}
+            disabled={isActive}
           />
           <input
-            className={`${BUTTONSTYLE}  w-1/2 mr-0`}
+            className={`${buttonStyle}  w-24 mr-0`}
             type="number"
             value={setRep[1]}
             onChange={handleReps}
+            disabled={isActive}
           />
         </div>
       </div>
       <div className="flex flex-row">
-        <div className={TAGSTYLE}>Rest (sec)</div>
+        <div className={tagStyle}>Rest (sec)</div>
         <input
           type="number"
           onChange={handleRest}
           value={workout.rest}
-          className={`${BUTTONSTYLE} w-52 `}
+          className={`${buttonStyle} w-52 `}
+          disabled={isActive}
         />
       </div>
     </div>
@@ -105,9 +117,9 @@ class trainingRecord {
 }
 
 const TAGSTYLE =
-  "bg-sky-300 w-32 text-center px-5 py-3 m-1 text-black rounded-lg";
+  "bg-sky-300 w-36 text-center px-5 py-3 m-1 text-black rounded-lg font-display text-lg";
 const BUTTONSTYLE =
-  "bg-sky-700 w-32 hover:bg-sky-900 text-center px-5 py-3 m-1 text-white rounded-lg";
+  "bg-sky-700 w-32 hover:bg-sky-900 text-center px-5 py-3 m-1 text-white rounded-lg text-lg";
 
 const today = new Date().toLocaleDateString("fr-ca");
 const initialWorkout = new trainingRecord(-1, today, "2x15", 120, []);
@@ -158,7 +170,7 @@ export default function Home() {
           // reps
           //newWorkout.reps = values[2]; skipping old reps
         } else if (ind === 3) {
-          // reps
+          // rest
           //newWorkout.rest = values[3]; skipping old rest
         } else {
           let ex = new exercise(item, values[ind]);
@@ -236,44 +248,48 @@ export default function Home() {
 
   return (
     <main className="h-screen overflow-hidden flex flex-col items-center justify-center w-full">
-      {fetched ? (
-        <Fragment>
-          <div>{workout.date}</div>
-          <div>{workout.reps}</div>
-          <div>{workout.rest}</div>
-          {workout.exercises.map((item, ind) => {
-            return (
-              <div className="flex flex-row" key={ind}>
-                <div className={TAGSTYLE}>{item.name}</div>
-                <input
-                  type="number"
-                  value={item.workload}
-                  className={BUTTONSTYLE}
-                  onChange={(e) => handleExercise(ind, e)}
-                />
-              </div>
-            );
-          })}
-          <button
-            className="bg-sky-600 hover:bg-sky-700 px-5 py-3 text-white rounded-lg"
-            onClick={() => handlePost()}
-          >
-            Add new Workout
-          </button>
-        </Fragment>
-      ) : (
-        <Fragment>
-          <Settings workout={workout} updateWorkout={updateWorkout} />
-          <button
-            className={`${BUTTONSTYLE} mx-0 w-auto`}
-            onClick={() => handleClick()}
-          >
-            Log New Workout
-          </button>
-        </Fragment>
-      )}
+      <div className="shadow-xl flex flex-col items-center p-5 justify-center border-slate-400 border-2 rounded-2xl border-solid">
+        <div className="font-header text-5xl pb-5 ">Fitness logger</div>
+        <Settings
+          workout={workout}
+          updateWorkout={updateWorkout}
+          isActive={fetched}
+        />
+        {fetched ? (
+          <Fragment>
+            {workout.exercises.map((item, ind) => {
+              return (
+                <div className="flex flex-row" key={ind}>
+                  <div className={TAGSTYLE}>{item.name}</div>
+                  <input
+                    type="number"
+                    value={item.workload}
+                    className={BUTTONSTYLE}
+                    onChange={(e) => handleExercise(ind, e)}
+                  />
+                </div>
+              );
+            })}
+            <button
+              className={`${BUTTONSTYLE} mt-3 mx-0 w-auto shadow-md active:shadow-none`}
+              onClick={() => handlePost()}
+            >
+              Add new Workout
+            </button>
+          </Fragment>
+        ) : (
+          <Fragment>
+            <button
+              className={`${BUTTONSTYLE} mt-3 mx-0 w-auto shadow-md active:shadow-none`}
+              onClick={() => handleClick()}
+            >
+              Log New Workout
+            </button>
+          </Fragment>
+        )}
 
-      {error ? <div>{error.message}</div> : null}
+        {error ? <div>{error.message}</div> : null}
+      </div>
     </main>
   );
 }
