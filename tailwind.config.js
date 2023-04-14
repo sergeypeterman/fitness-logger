@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+
 module.exports = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx}',
@@ -341,6 +342,8 @@ module.exports = {
         '"Courier New"',
         'monospace',
       ],
+      header: ['Racing Sans One','ui-sans-serif'],
+      display: ['Rambla','ui-sans-serif']
     },
     fontSize: {
       xs: ['0.75rem', { lineHeight: '1rem' }],
