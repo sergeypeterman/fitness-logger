@@ -21,10 +21,14 @@ export default async function handler(req, res) {
     if(req.method === 'POST'){
       console.log(`BODY TYPE: ${typeof req.body}: ${req.body}`);
 
-      values = [...req.body];
-      values.map((item, ind)=>{
-        sheet.getCell(1,ind).value = item;
-      });
+      const dimensions = {startIndex:1, endIndex:2};
+      sheet.insertDimension('ROWS', dimensions, true);//insert a row in the beginning and getting new rows
+      rows = await sheet.getRows(); 
+
+      values = [...req.body];//reading new values and writing them to the new row
+      const options = {raw:false, insert: false, index: 0};
+      sheet.addRow(values, options);
+      
       
       //updating data and sheet
       await sheet.saveUpdatedCells();
