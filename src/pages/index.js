@@ -38,6 +38,15 @@ function Settings({ workout, updateWorkout }) {
 
   const setRep = workout.reps.split("x");
 
+  const handleRest = (event) => {
+    //handling date input
+    const newRest = event.target.value;
+    let newW = { ...workout };
+
+    newW.rest = newRest;
+    updateWorkout(newW);
+  };
+
   return (
     <div>
       <div className="flex flex-row">
@@ -46,22 +55,33 @@ function Settings({ workout, updateWorkout }) {
           type="date"
           onChange={handleDate}
           value={workout.date}
-          className={`${BUTTONSTYLE} w-48`}
+          className={`${BUTTONSTYLE} w-52 `}
         />
       </div>
       <div className="flex flex-row">
         <div className={`${TAGSTYLE} mr-2`}>Reps</div>
+        <div className="flex flex-row justify-between w-52">
+          <input
+            className={`${BUTTONSTYLE}  w-1/2 ml-0`}
+            type="number"
+            value={setRep[0]}
+            onChange={handleSets}
+          />
+          <input
+            className={`${BUTTONSTYLE}  w-1/2 mr-0`}
+            type="number"
+            value={setRep[1]}
+            onChange={handleReps}
+          />
+        </div>
+      </div>
+      <div className="flex flex-row">
+        <div className={TAGSTYLE}>Rest (sec)</div>
         <input
-          className={`${BUTTONSTYLE} mx-0 w-24`}
           type="number"
-          value={setRep[0]}
-          onChange={handleSets}
-        />
-        <input
-          className={`${BUTTONSTYLE} mx-0 w-24`}
-          type="number"
-          value={setRep[1]}
-          onChange={handleReps}
+          onChange={handleRest}
+          value={workout.rest}
+          className={`${BUTTONSTYLE} w-52 `}
         />
       </div>
     </div>
@@ -75,10 +95,11 @@ function exercise(name, workload) {
 }
 
 class trainingRecord {
-  constructor(id, date, reps, exercises = []) {
+  constructor(id, date, reps, rest, exercises = []) {
     this.id = id;
     this.date = date;
     this.reps = reps;
+    this.rest = rest;
     this.exercises = exercises;
   }
 }
@@ -86,10 +107,10 @@ class trainingRecord {
 const TAGSTYLE =
   "bg-sky-300 w-32 text-center px-5 py-3 m-1 text-black rounded-lg";
 const BUTTONSTYLE =
-  "bg-sky-700 hover:bg-sky-900 w-32 text-center px-5 py-3 m-1 text-white rounded-lg";
+  "bg-sky-700 w-32 hover:bg-sky-900 text-center px-5 py-3 m-1 text-white rounded-lg";
 
 const today = new Date().toLocaleDateString("fr-ca");
-const initialWorkout = new trainingRecord(-1, today, "2x15", []);
+const initialWorkout = new trainingRecord(-1, today, "2x15", 120, []);
 //////////////////////***************************************/
 
 export default function Home() {
@@ -103,15 +124,15 @@ export default function Home() {
   };
 
   const resetWorkout = () => {
-    const blank = {...initialWorkout};
+    const blank = { ...initialWorkout };
     blank.exercises.length = 0; //reset exercises
     setWorkout(blank);
-  }
+  };
 
   const handleClick = async () => {
     try {
-      const response = await fetch(`/api/training-data`,{
-        method: 'GET',
+      const response = await fetch(`/api/training-data`, {
+        method: "GET",
       });
       if (!response.ok) {
         console.log(response.statusText);
@@ -136,6 +157,9 @@ export default function Home() {
         } else if (ind === 2) {
           // reps
           //newWorkout.reps = values[2]; skipping old reps
+        } else if (ind === 3) {
+          // reps
+          //newWorkout.rest = values[3]; skipping old rest
         } else {
           let ex = new exercise(item, values[ind]);
           newWorkout.exercises.push(ex);
@@ -156,8 +180,7 @@ export default function Home() {
   const handlePost = async () => {
     const newValues = [];
 
-    for(let ind=0; ind<(workout.exercises.length + 3); ind++)
-    {
+    for (let ind = 0; ind < workout.exercises.length + 4; ind++) {
       let item;
       if (ind === 0) {
         // id
@@ -168,22 +191,24 @@ export default function Home() {
       } else if (ind === 2) {
         // reps
         item = workout.reps;
+      } else if (ind === 3) {
+        // rest
+        item = workout.rest;
       } else {
         //exercises
-        item = workout.exercises[ind-3].workload;
+        item = workout.exercises[ind - 4].workload;
       }
       newValues.push(item);
     }
 
     try {
-      const response = await fetch(`/api/training-data`,{
-        method: 'POST',
+      const response = await fetch(`/api/training-data`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(newValues),
       });
-
 
       if (!response.ok) {
         console.log(response.statusText);
@@ -215,6 +240,7 @@ export default function Home() {
         <Fragment>
           <div>{workout.date}</div>
           <div>{workout.reps}</div>
+          <div>{workout.rest}</div>
           {workout.exercises.map((item, ind) => {
             return (
               <div className="flex flex-row" key={ind}>
