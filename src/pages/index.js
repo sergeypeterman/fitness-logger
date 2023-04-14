@@ -181,7 +181,7 @@ export default function Home() {
       setWorkout(newWorkout);
       setFetched(true);
     } catch (err) {
-      console.log("error.message handleclick");
+      console.log("error.message handleclick: "+ err.message);
       setError({
         error: true,
         message: err.message,
