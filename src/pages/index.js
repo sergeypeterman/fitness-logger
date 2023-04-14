@@ -106,7 +106,9 @@ export default function Home() {
 
   const handleClick = async () => {
     try {
-      const response = await fetch(`/api/training-data`);
+      const response = await fetch(`/api/training-data`,{
+        method: 'GET',
+      });
       if (!response.ok) {
         console.log(response.statusText);
         throw new Error(response.statusText);
@@ -120,15 +122,16 @@ export default function Home() {
       headers.map((item, ind) => {
         if (ind === 0) {
           // id
-          newWorkout.id = values[0] + 1; // new id
+          newWorkout.id = Number(values[0]) + 1; // new id
+          console.log("new id: " + newWorkout.id);
         } else if (ind === 1) {
-          // date
-          //newWorkout.date = values[1]; skipping old date
+          /* date. Skipping old date 
+          let oldDate = new Date(values[1]).toLocaleDateString("fr-ca");
+          newWorkout.date = oldDate; */
         } else if (ind === 2) {
           // reps
           //newWorkout.reps = values[2]; skipping old reps
         } else {
-          console.log(`ind = ${ind} values = ${values[ind]}`);
           let ex = new exercise(item, values[ind]);
           newWorkout.exercises.push(ex);
         }
@@ -146,33 +149,44 @@ export default function Home() {
   };
 
   const handlePost = async () => {
-    const newValues = values.map((item, ind) => {
-      if (ind === 0) {
-        // if it's date
-        let dt = new Date(Date.parse(item));
-        dt.setDate(dt.getDate() + 1);
-        item = dt.toDateString().split(" ").slice(1).join(" ");
-        console.log(item);
-      } else {
-        item = Number(item) + 1;
-      }
-    });
+    const newValues = [];
 
-    setValues(newValues);
+    for(let ind=0; ind<(workout.exercises.length + 3); ind++)
+    {
+      let item;
+      if (ind === 0) {
+        // id
+        item = workout.id;
+      } else if (ind === 1) {
+        //date
+        item = workout.date;
+      } else if (ind === 2) {
+        // reps
+        item = workout.reps;
+      } else {
+        //exercises
+        item = workout.exercises[ind-3].workload;
+      }
+      newValues.push(item);
+    }
 
     try {
-      const response = await fetch(`/api/training-data?post=true`);
+      const response = await fetch(`/api/training-data`,{
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newValues),
+      });
+
+
       if (!response.ok) {
         console.log(response.statusText);
         throw new Error(response.statusText);
       }
 
-      const results = await response.json();
-      console.log(results);
-      const { headers, values } = results;
-      setHeaders(headers);
-      setValues(values);
-      setFetched(true);
+      setFetched(false); //reset fetch status
+      setWorkout(initialWorkout); //reset workout state
     } catch (err) {
       console.log("error.message");
       setError({
@@ -180,6 +194,14 @@ export default function Home() {
         message: err.message,
       });
     }
+  };
+
+  const handleExercise = (index, event) => {
+    let newW = { ...workout };
+    let newLoad = event.target.value;
+
+    newW.exercises[index].workload = newLoad;
+    setWorkout(newW);
   };
 
   return (
@@ -196,6 +218,7 @@ export default function Home() {
                   type="number"
                   value={item.workload}
                   className={BUTTONSTYLE}
+                  onChange={(e) => handleExercise(ind, e)}
                 />
               </div>
             );
