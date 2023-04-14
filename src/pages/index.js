@@ -93,16 +93,20 @@ const initialWorkout = new trainingRecord(-1, today, "2x15", []);
 //////////////////////***************************************/
 
 export default function Home() {
-  const [headers, setHeaders] = useState(null);
-  const [values, setValues] = useState(null);
   const [error, setError] = useState(false);
   const [workout, setWorkout] = useState(initialWorkout);
-  const [fetched, setFetched] = useState(false); // is the get rows button pressed. probably will be deleted
+  const [fetched, setFetched] = useState(false); // is the first button pressed
 
   const updateWorkout = (wout) => {
     setWorkout(wout);
     console.log("worked " + workout.date);
   };
+
+  const resetWorkout = () => {
+    const blank = {...initialWorkout};
+    blank.exercises.length = 0; //reset exercises
+    setWorkout(blank);
+  }
 
   const handleClick = async () => {
     try {
@@ -115,10 +119,11 @@ export default function Home() {
       }
 
       const results = await response.json();
-      console.log(results);
       const { headers, values } = results;
       const newWorkout = { ...workout };
 
+      console.log(`current workout obj:`);
+      console.log(workout);
       headers.map((item, ind) => {
         if (ind === 0) {
           // id
@@ -186,7 +191,7 @@ export default function Home() {
       }
 
       setFetched(false); //reset fetch status
-      setWorkout(initialWorkout); //reset workout state
+      resetWorkout(); //reset workout state
     } catch (err) {
       console.log("error.message");
       setError({
