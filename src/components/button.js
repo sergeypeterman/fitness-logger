@@ -8,12 +8,6 @@ export function Button({
 }) {
   if (isLoading == true) {
     return (
-      /*<button
-        name="new-workout"
-        className={`${BUTTONSTYLE} mt-3 mx-0 w-auto shadow-md active:shadow-none`}
-        onClick={() => onClickHandler()}
-      >{caption}</button>*/
-
       <button
         disabled
         type="button"
@@ -46,7 +40,6 @@ export function Button({
       </button>
     );
   } else {
-    console.log(isLoading);
     return (
       <button
         name="new-workout"

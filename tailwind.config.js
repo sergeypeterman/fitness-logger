@@ -342,7 +342,7 @@ module.exports = {
         '"Courier New"',
         'monospace',
       ],
-      header: ['Racing Sans One','ui-sans-serif'],
+      header: ['Cuprum','ui-sans-serif'],
       display: ['Rambla','ui-sans-serif']
     },
     fontSize: {
@@ -677,6 +677,7 @@ module.exports = {
       min: 'min-content',
       max: 'max-content',
       fit: 'fit-content',
+      sm: '24rem',
     },
     objectPosition: {
       bottom: 'bottom',
