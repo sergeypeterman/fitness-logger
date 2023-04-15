@@ -234,8 +234,8 @@ export default function Home() {
               <Button
                 buttonCaption={"Add new Workout"}
                 isLoading={isLoading}
-                updateLoading={setLoading}
                 onClickHandler={handlePost}
+                loadingCaption={"Uploading Workout"}
               />
             </div>
           </Fragment>
@@ -244,8 +244,8 @@ export default function Home() {
             <Button
               buttonCaption={"Log New Workout"}
               isLoading={isLoading}
-              updateLoading={setLoading}
               onClickHandler={handleClick}
+              loadingCaption={"Retrieving Last Workout"}
             />
           </Fragment>
         )}
