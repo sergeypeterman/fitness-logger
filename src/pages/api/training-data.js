@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     await sheet.loadCells();
     //if fetching with post == true , update the sheet
     if (req.method == "POST") {
-      console.log(`BODY TYPE: ${typeof req.body}: ${req.body}`);
+      //console.log(`BODY TYPE: ${typeof req.body}: ${req.body}`);
 
       const dimensions = { startIndex: 1, endIndex: 2 };
       await sheet.insertDimension("ROWS", dimensions, true); //insert a row in the beginning and getting new rows
@@ -29,8 +29,10 @@ export default async function handler(req, res) {
 
       //updating data and sheet
       await sheet.saveUpdatedCells();
+
       res.status(200).json({ message: "Added" });
     } else if (req.method == "GET") {
+      //is it a first workout in the sheet? if yes, fill values with 0-s
       if (rows.length) {
         values = [...rows[0]._rawData]; //getting values
       } else {

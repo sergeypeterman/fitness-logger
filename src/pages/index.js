@@ -1,126 +1,9 @@
 import { Fragment, useState } from "react";
-
-function Settings({ workout, updateWorkout, isActive }) {
-  // component for setting the date and reps, input is disabled when it's used inside a new workout
-
-  const handleDate = (event) => {
-    //handling date input
-    const newDate = event.target.value;
-    let newW = { ...workout };
-
-    newW.date = newDate;
-    updateWorkout(newW);
-  };
-
-  const handleReps = (event) => {
-    //handling reps part of Reps input
-    let newW = { ...workout };
-    let newReps = event.target.value;
-    let newRepsArr = newW.reps.split("x");
-
-    newRepsArr[1] = newReps;
-
-    newW.reps = newRepsArr.join("x");
-
-    updateWorkout(newW);
-  };
-
-  const handleSets = (event) => {
-    //handling sets part of Reps input
-    let newW = { ...workout };
-    let newSets = event.target.value;
-    let newRepsArr = newW.reps.split("x");
-
-    newRepsArr[0] = newSets;
-
-    newW.reps = newRepsArr.join("x");
-
-    updateWorkout(newW);
-  };
-
-  const setRep = workout.reps.split("x"); //extracting sets and reps to an array
-  const buttonStyle = isActive
-    ? "text-center px-5 py-3 m-1 text-black rounded-lg text-lg bg-gray-300"
-    : BUTTONSTYLE;
-  const tagStyle = isActive
-    ? "bg-gray-300 w-36 text-center px-5 py-3 m-1 text-black rounded-lg font-display text-lg"
-    : TAGSTYLE;
-
-  const handleRest = (event) => {
-    //handling date input
-    const newRest = event.target.value;
-    let newW = { ...workout };
-
-    newW.rest = newRest;
-    updateWorkout(newW);
-  };
-
-  return (
-    <div>
-      <div className="flex flex-row">
-        <div className={tagStyle}>Date</div>
-        <input
-          type="date"
-          onChange={handleDate}
-          value={workout.date}
-          className={`${buttonStyle} w-52 `}
-          disabled={isActive}
-        />
-      </div>
-      <div className="flex flex-row">
-        <div className={`${tagStyle} mr-2`}>Reps</div>
-        <div className="flex flex-row justify-between w-52">
-          <input
-            className={`${buttonStyle}  w-1/2 ml-0`}
-            type="number"
-            value={setRep[0]}
-            onChange={handleSets}
-            disabled={isActive}
-          />
-          <input
-            className={`${buttonStyle}  w-1/2 mr-0`}
-            type="number"
-            value={setRep[1]}
-            onChange={handleReps}
-            disabled={isActive}
-          />
-        </div>
-      </div>
-      <div className="flex flex-row">
-        <div className={tagStyle}>Rest (sec)</div>
-        <input
-          type="number"
-          onChange={handleRest}
-          value={workout.rest}
-          className={`${buttonStyle} w-52 `}
-          disabled={isActive}
-        />
-      </div>
-    </div>
-  );
-}
+import { Settings } from "../components/settings";
+import { exercise, trainingRecord, TAGSTYLE, BUTTONSTYLE } from "../components/constants";
+import { Button } from "@/components/button.js";
 
 //////////////////////***************************************/
-function exercise(name, workload) {
-  this.name = name;
-  this.workload = workload;
-}
-
-class trainingRecord {
-  constructor(id, date, reps, rest, exercises = []) {
-    this.id = id;
-    this.date = date;
-    this.reps = reps;
-    this.rest = rest;
-    this.exercises = exercises;
-  }
-}
-
-const TAGSTYLE =
-  "bg-sky-300 w-36 text-center px-5 py-3 m-1 text-black rounded-lg font-display text-lg";
-const BUTTONSTYLE =
-  "bg-sky-700 hover:bg-sky-900 text-center px-5 py-3 m-1 text-white rounded-lg text-lg";
-
 const today = new Date().toLocaleDateString("fr-ca");
 const initialWorkout = new trainingRecord(-1, today, "2x15", 120, []);
 //////////////////////***************************************/
@@ -129,10 +12,10 @@ export default function Home() {
   const [error, setError] = useState(false);
   const [workout, setWorkout] = useState(initialWorkout);
   const [fetched, setFetched] = useState(false); // is the first button pressed
+  const [isLoading, setLoading] = useState(false);
 
   const updateWorkout = (wout) => {
     setWorkout(wout);
-    console.log("worked " + workout.date);
   };
 
   const resetWorkout = () => {
@@ -143,6 +26,12 @@ export default function Home() {
 
   const handleClick = async () => {
     try {
+      //Loading last workout on "Log New Workout" to ease the new input for the user.
+      //May be rewrited to choose a training based on reps scheme
+      //omitting date, reps and rest
+
+      setLoading(true); //loading...
+
       const response = await fetch(`/api/training-data`, {
         method: "GET",
       });
@@ -151,12 +40,12 @@ export default function Home() {
         throw new Error(response.statusText);
       }
 
+      //handling the response. headers: table headers, values: corresponding values of the last workout
       const results = await response.json();
       const { headers, values } = results;
       const newWorkout = { ...workout };
 
-      console.log(`current workout obj:`);
-      console.log(workout);
+      //populating workout with the exercises' data and a new id
       headers.map((item, ind) => {
         if (ind === 0) {
           // id
@@ -178,10 +67,12 @@ export default function Home() {
         }
       });
 
+      //updating state: workout and 'fetched' flag, loading is done
       setWorkout(newWorkout);
       setFetched(true);
+      setLoading(false);
     } catch (err) {
-      console.log("error.message handleclick: "+ err.message);
+      console.log("error.message handleclick: " + err.message);
       setError({
         error: true,
         message: err.message,
@@ -190,6 +81,10 @@ export default function Home() {
   };
 
   const handlePost = async () => {
+    //handling posting the data to the api
+
+    setLoading(true); //loading...
+    //formatting workout to an array so it will be posted to the api
     const newValues = [];
 
     for (let ind = 0; ind < workout.exercises.length + 4; ind++) {
@@ -227,8 +122,9 @@ export default function Home() {
         throw new Error(response.statusText);
       }
 
+      setLoading(false); //loading done
       setFetched(false); //reset fetch status
-      resetWorkout(); //reset workout state
+      resetWorkout(); //reset workout' state
     } catch (err) {
       console.log("error.message");
       setError({
@@ -239,6 +135,8 @@ export default function Home() {
   };
 
   const handleExercise = (index, event) => {
+    //handling workload changes in the exercises screen
+
     let newW = { ...workout };
     let newLoad = event.target.value;
 
@@ -248,20 +146,26 @@ export default function Home() {
 
   return (
     <main className="h-screen overflow-hidden flex flex-col items-center justify-center w-full">
-      <div className="shadow-xl flex flex-col items-center p-5 justify-center border-slate-400 border-2 rounded-2xl border-solid">
-        <div className="font-header text-5xl pb-5 ">Fitness logger</div>
+      <div
+        name="widget"
+        className="shadow-xl flex flex-col items-center p-5 justify-center border-slate-400 border-2 rounded-2xl border-solid"
+      >
+        <div name="logo" className="font-header text-5xl pb-5 ">
+          Fitness logger
+        </div>
         <Settings
           workout={workout}
           updateWorkout={updateWorkout}
           isActive={fetched}
         />
-        {fetched ? (
+        {fetched ? ( //if the data is fetched, render exercises screen
           <Fragment>
             {workout.exercises.map((item, ind) => {
               return (
-                <div className="flex flex-row" key={ind}>
+                <div name="exercises" className="flex flex-row" key={ind}>
                   <div className={TAGSTYLE}>{item.name}</div>
                   <input
+                    name={`exercise-${ind}`}
                     type="number"
                     value={item.workload}
                     className={`${BUTTONSTYLE}  w-32 mr-0`}
@@ -270,21 +174,23 @@ export default function Home() {
                 </div>
               );
             })}
-            <button
-              className={`${BUTTONSTYLE} mt-3 mx-0 w-auto shadow-md active:shadow-none`}
-              onClick={() => handlePost()}
-            >
-              Add new Workout
-            </button>
+
+            <Button
+              buttonCaption={"Add new Workout"}
+              isLoading={isLoading}
+              updateLoading={setLoading}
+              onClickHandler={handlePost}
+            />
           </Fragment>
         ) : (
           <Fragment>
-            <button
-              className={`${BUTTONSTYLE} mt-3 mx-0 w-auto shadow-md active:shadow-none`}
-              onClick={() => handleClick()}
-            >
-              Log New Workout
-            </button>
+            
+            <Button
+              buttonCaption={"Log New Workout"}
+              isLoading={isLoading}
+              updateLoading={setLoading}
+              onClickHandler={handleClick}
+            />
           </Fragment>
         )}
 
@@ -293,3 +199,20 @@ export default function Home() {
     </main>
   );
 }
+
+
+/*<button
+              name="new-workout"
+              className={`${BUTTONSTYLE} mt-3 mx-0 w-auto shadow-md active:shadow-none`}
+              onClick={() => handleClick()}
+            >
+              Log New Workout
+            </button>
+            
+                        <button
+              name="post-workout"
+              className={`${BUTTONSTYLE} mt-3 mx-0 w-auto shadow-md active:shadow-none`}
+              onClick={() => handlePost()}
+            >
+              Add new Workout
+            </button>*/
