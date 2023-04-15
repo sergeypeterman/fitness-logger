@@ -220,23 +220,24 @@ export default function Home() {
                 </div>
               );
             })}
-
-            <Button
-              buttonCaption={"Add new Workout"}
-              isLoading={isLoading}
-              updateLoading={setLoading}
-              onClickHandler={handlePost}
-            />
-            <button
-              name="back"
-              className={`${BUTTONSTYLE} mt-3 mx-0 w-auto shadow-md active:shadow-none`}
-              onClick={() => {
-                setFetched(false);
-                resetWorkout();
-              }}
-            >
-              Back
-            </button>
+            <div className="flex w-full justify-between">
+              <button
+                name="back"
+                className={`${BUTTONSTYLE} mt-3 shadow-md active:shadow-none`}
+                onClick={() => {
+                  setFetched(false);
+                  resetWorkout();
+                }}
+              >
+                Back
+              </button>
+              <Button
+                buttonCaption={"Add new Workout"}
+                isLoading={isLoading}
+                updateLoading={setLoading}
+                onClickHandler={handlePost}
+              />
+            </div>
           </Fragment>
         ) : (
           <Fragment>
