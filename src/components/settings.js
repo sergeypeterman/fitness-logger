@@ -1,6 +1,15 @@
-import {exercise, trainingRecord, TAGSTYLE, BUTTONSTYLE} from './constants'
+import { exercise, trainingRecord, TAGSTYLE, BUTTONSTYLE } from "./constants";
 
-export function Settings({ workout, updateWorkout, isActive }) {
+export function Settings({
+  workout,
+  updateWorkout,
+  isActive,
+  program,
+  selectedProgram,
+  updateProgram,
+  isLoading,
+  updateLoading
+}) {
   // component for setting the date and reps, input is disabled when it's used inside a new workout
 
   const handleDate = (event) => {
@@ -38,13 +47,21 @@ export function Settings({ workout, updateWorkout, isActive }) {
     updateWorkout(newW);
   };
 
+  const handleProgram = (event) => {
+    const newProgram = event.target.value;
+    updateProgram(newProgram);
+  };
+
   const setRep = workout.reps.split("x"); //extracting sets and reps to an array
   const buttonStyle = isActive
     ? "text-center px-5 py-3 m-1 text-black rounded-lg text-lg bg-gray-300"
     : BUTTONSTYLE;
   const tagStyle = isActive
-    ? "bg-gray-300 w-36 text-center px-5 py-3 m-1 text-black rounded-lg font-display text-lg"
-    : TAGSTYLE;
+    ? "bg-gray-300 w-1/3 text-center px-5 py-3 m-1 text-black rounded-lg font-display text-lg"
+    : `${TAGSTYLE} w-1/3`;
+  const smButtonStyle = isActive
+    ? "bg-gray-300 hover:bg-sky-900 text-center px-5 py-3 w-1/2 text-black rounded-lg text-lg"
+    : `bg-sky-700 hover:bg-sky-900 text-center px-5 py-3 w-1/2 text-white rounded-lg text-lg`;
 
   const handleRest = (event) => {
     //handling date input
@@ -56,16 +73,20 @@ export function Settings({ workout, updateWorkout, isActive }) {
   };
 
   return (
-    <div>
-      <div className="flex flex-row">
+    <div name="settings" className="w-full">
+      <div className="flex flex-row ">
         <div className={tagStyle}>Program</div>
-        <input
-          type="date"
-          onChange={handleDate}
-          value={workout.date}
-          className={`${buttonStyle} w-52 `}
+        <select
+          type="text"
+          onChange={handleProgram}
+          value={selectedProgram}
+          className={`${buttonStyle} w-2/3 `}
           disabled={isActive}
-        />
+        >
+          {program.map((item, ind) => {
+            return <option key={`pr-${ind}`}>{item}</option>;
+          })}
+        </select>
       </div>
       <div className="flex flex-row">
         <div className={tagStyle}>Date</div>
@@ -73,22 +94,22 @@ export function Settings({ workout, updateWorkout, isActive }) {
           type="date"
           onChange={handleDate}
           value={workout.date}
-          className={`${buttonStyle} w-52 `}
+          className={`${buttonStyle} w-2/3 `}
           disabled={isActive}
         />
       </div>
       <div className="flex flex-row">
-        <div className={`${tagStyle} mr-2`}>Reps</div>
-        <div className="flex flex-row justify-between w-52">
+        <div className={`${tagStyle}`}>Reps</div>
+        <div className="flex flex-row justify-between w-2/3 m-1">
           <input
-            className={`${buttonStyle}  w-1/2 ml-0`}
+            className={`${smButtonStyle} mr-1`}
             type="number"
             value={setRep[0]}
             onChange={handleSets}
             disabled={isActive}
           />
           <input
-            className={`${buttonStyle}  w-1/2 mr-0`}
+            className={`${smButtonStyle} ml-1`}
             type="number"
             value={setRep[1]}
             onChange={handleReps}
@@ -102,7 +123,7 @@ export function Settings({ workout, updateWorkout, isActive }) {
           type="number"
           onChange={handleRest}
           value={workout.rest}
-          className={`${buttonStyle} w-52 `}
+          className={`${buttonStyle} w-2/3 `}
           disabled={isActive}
         />
       </div>

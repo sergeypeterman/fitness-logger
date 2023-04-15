@@ -1,11 +1,17 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Settings } from "../components/settings";
-import { exercise, trainingRecord, TAGSTYLE, BUTTONSTYLE } from "../components/constants";
+import {
+  exercise,
+  trainingRecord,
+  TAGSTYLE,
+  BUTTONSTYLE,
+} from "../components/constants";
 import { Button } from "@/components/button.js";
 
 //////////////////////***************************************/
 const today = new Date().toLocaleDateString("fr-ca");
 const initialWorkout = new trainingRecord(-1, today, "2x15", 120, []);
+
 //////////////////////***************************************/
 
 export default function Home() {
@@ -13,9 +19,33 @@ export default function Home() {
   const [workout, setWorkout] = useState(initialWorkout);
   const [fetched, setFetched] = useState(false); // is the first button pressed
   const [isLoading, setLoading] = useState(false);
+  const [program, setProgram] = useState([]);
+  const [selectedProgram, setSelectedProgram] = useState("");
+
+  useEffect(() => {
+    const initial = Buffer.from("initial").toString("base64");
+    const test = Buffer.from(initial, "base64").toString("ascii");
+    console.log(`${initial} encoded from ${test}`);
+
+    const response = fetch(`/api/training-data?selected=${initial}`, {
+      method: "GET",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const { titles } = data;
+        setProgram(titles);
+        setSelectedProgram(titles[0]);
+        console.log(titles[0]);
+      })
+      .catch((error) => console.error(error));
+  }, []);
 
   const updateWorkout = (wout) => {
     setWorkout(wout);
+  };
+
+  const updateProgram = (prg) => {
+    setSelectedProgram(prg);
   };
 
   const resetWorkout = () => {
@@ -26,15 +56,19 @@ export default function Home() {
 
   const handleClick = async () => {
     try {
-      //Loading last workout on "Log New Workout" to ease the new input for the user.
+      /*Loading last workout of the selected program on "Log New Workout"
+      to ease the new input for the user.*/
       //May be rewrited to choose a training based on reps scheme
       //omitting date, reps and rest
 
       setLoading(true); //loading...
 
-      const response = await fetch(`/api/training-data`, {
-        method: "GET",
-      });
+      const response = await fetch(
+        `/api/training-data?selected=${selectedProgram}`,
+        {
+          method: "GET",
+        }
+      );
       if (!response.ok) {
         console.log(response.statusText);
         throw new Error(response.statusText);
@@ -109,13 +143,16 @@ export default function Home() {
     }
 
     try {
-      const response = await fetch(`/api/training-data`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newValues),
-      });
+      const response = await fetch(
+        `/api/training-data?selected=${selectedProgram}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newValues),
+        }
+      );
 
       if (!response.ok) {
         console.log(response.statusText);
@@ -145,30 +182,39 @@ export default function Home() {
   };
 
   return (
-    <main className="h-screen overflow-hidden flex flex-col items-center justify-center w-full">
+    <main className="h-screen overflow-hidden flex flex-col items-center justify-center w-full ">
       <div
         name="widget"
-        className="shadow-xl flex flex-col items-center p-5 justify-center border-slate-400 border-2 rounded-2xl border-solid"
+        className="max-w-lg min-w-sm shadow-xl flex flex-col items-center p-5 justify-center border-slate-400 border-2 rounded-2xl border-solid"
       >
         <div name="logo" className="font-header text-5xl pb-5 ">
-          Fitness logger
+          FITNESS LOGGER
         </div>
         <Settings
           workout={workout}
           updateWorkout={updateWorkout}
           isActive={fetched}
+          program={program}
+          selectedProgram={selectedProgram}
+          updateProgram={updateProgram}
+          isLoading={isLoading}
+          updateLoading={setLoading}
         />
         {fetched ? ( //if the data is fetched, render exercises screen
           <Fragment>
             {workout.exercises.map((item, ind) => {
               return (
-                <div name="exercises" className="flex flex-row" key={ind}>
-                  <div className={TAGSTYLE}>{item.name}</div>
+                <div
+                  name="exercises"
+                  className="flex flex-row w-full "
+                  key={ind}
+                >
+                  <div className={`${TAGSTYLE} w-2/3 `}>{item.name}</div>
                   <input
                     name={`exercise-${ind}`}
                     type="number"
                     value={item.workload}
-                    className={`${BUTTONSTYLE}  w-32 mr-0`}
+                    className={`${BUTTONSTYLE}  w-1/3`}
                     onChange={(e) => handleExercise(ind, e)}
                   />
                 </div>
@@ -181,10 +227,19 @@ export default function Home() {
               updateLoading={setLoading}
               onClickHandler={handlePost}
             />
+            <button
+              name="back"
+              className={`${BUTTONSTYLE} mt-3 mx-0 w-auto shadow-md active:shadow-none`}
+              onClick={() => {
+                setFetched(false);
+                resetWorkout();
+              }}
+            >
+              Back
+            </button>
           </Fragment>
         ) : (
           <Fragment>
-            
             <Button
               buttonCaption={"Log New Workout"}
               isLoading={isLoading}
@@ -199,7 +254,6 @@ export default function Home() {
     </main>
   );
 }
-
 
 /*<button
               name="new-workout"
