@@ -43,7 +43,7 @@ export function Button({
     return (
       <button
         name="new-workout"
-        className={`${BUTTONSTYLE} mt-3 mx-0 w-auto shadow-md active:shadow-none`}
+        className={`${BUTTONSTYLE} mt-3 mx-1 w-auto shadow-md active:shadow-none`}
         onClick={() => onClickHandler()}
       >
         {buttonCaption}

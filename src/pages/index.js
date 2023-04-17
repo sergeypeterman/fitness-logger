@@ -37,8 +37,18 @@ export default function Home() {
         setSelectedProgram(titles[0]);
         console.log(titles[0]);
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        console.error(error);
+        setError({
+          error: true,
+          message: error.message,
+        });
+      });
   }, []);
+
+  const updateError = (err) => {
+    err ? setError({error:true, message:err}): setError(err);
+  }
 
   const updateWorkout = (wout) => {
     setWorkout(wout);
@@ -172,7 +182,7 @@ export default function Home() {
   };
 
   const handleExercise = (index, event) => {
-    //handling workload changes in the exercises screen
+    //handling workload changes in the exercises screen items-center justify-center
 
     let newW = { ...workout };
     let newLoad = event.target.value;
@@ -182,12 +192,12 @@ export default function Home() {
   };
 
   return (
-    <main className="h-screen overflow-hidden flex flex-col items-center justify-center w-full ">
+    <main className="h-screen relative overflow-auto flex flex-col m-auto w-full ">
       <div
         name="widget"
-        className="max-w-lg min-w-sm shadow-xl flex flex-col items-center p-5 justify-center border-slate-400 border-2 rounded-2xl border-solid"
+        className="max-w-lg min-w-sm shadow-xl flex flex-col p-5 m-auto border-slate-400 border-2 rounded-2xl border-solid"
       >
-        <div name="logo" className="font-header text-5xl pb-5 ">
+        <div name="logo" className="font-header text-5xl pb-5 m-auto ">
           FITNESS LOGGER
         </div>
         <Settings
@@ -199,6 +209,8 @@ export default function Home() {
           updateProgram={updateProgram}
           isLoading={isLoading}
           updateLoading={setLoading}
+          error={error}
+          updateError={updateError}
         />
         {fetched ? ( //if the data is fetched, render exercises screen
           <Fragment>
