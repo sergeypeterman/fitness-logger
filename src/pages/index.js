@@ -7,6 +7,7 @@ import {
   BUTTONSTYLE,
 } from "../components/constants";
 import { Button } from "@/components/button.js";
+import { Exercises } from "@/components/exercises";
 
 //////////////////////***************************************/
 const today = new Date().toLocaleDateString("fr-ca");
@@ -47,8 +48,8 @@ export default function Home() {
   }, []);
 
   const updateError = (err) => {
-    err ? setError({error:true, message:err}): setError(err);
-  }
+    err ? setError({ error: true, message: err }) : setError(err);
+  };
 
   const updateWorkout = (wout) => {
     setWorkout(wout);
@@ -57,6 +58,10 @@ export default function Home() {
   const updateProgram = (prg) => {
     setSelectedProgram(prg);
   };
+
+  const updateFetched = (isFetched) => {
+    setFetched(isFetched);
+  }
 
   const resetWorkout = () => {
     const blank = { ...initialWorkout };
@@ -181,16 +186,6 @@ export default function Home() {
     }
   };
 
-  const handleExercise = (index, event) => {
-    //handling workload changes in the exercises screen items-center justify-center
-
-    let newW = { ...workout };
-    let newLoad = event.target.value;
-
-    newW.exercises[index].workload = newLoad;
-    setWorkout(newW);
-  };
-
   return (
     <main className="h-screen relative overflow-auto flex flex-col m-auto w-full ">
       <div
@@ -214,24 +209,10 @@ export default function Home() {
         />
         {fetched ? ( //if the data is fetched, render exercises screen
           <Fragment>
-            {workout.exercises.map((item, ind) => {
-              return (
-                <div
-                  name="exercises"
-                  className="flex flex-row w-full "
-                  key={ind}
-                >
-                  <div className={`${TAGSTYLE} w-2/3 `}>{item.name}</div>
-                  <input
-                    name={`exercise-${ind}`}
-                    type="number"
-                    value={item.workload}
-                    className={`${BUTTONSTYLE}  w-1/3`}
-                    onChange={(e) => handleExercise(ind, e)}
-                  />
-                </div>
-              );
-            })}
+            <Exercises
+              workout={workout}
+              updateWorkout={updateWorkout}
+            />
             <div className="flex w-full justify-between">
               <button
                 name="back"
@@ -282,4 +263,25 @@ export default function Home() {
               onClick={() => handlePost()}
             >
               Add new Workout
-            </button>*/
+            </button>
+            
+            
+            
+            {workout.exercises.map((item, ind) => {
+              return (
+                <div
+                  name="exercises"
+                  className="flex flex-row w-full "
+                  key={ind}
+                >
+                  <div className={`${TAGSTYLE} w-2/3 `}>{item.name}</div>
+                  <input
+                    name={`exercise-${ind}`}
+                    type="number"
+                    value={item.workload}
+                    className={`${BUTTONSTYLE}  w-1/3`}
+                    onChange={(e) => handleExercise(ind, e)}
+                  />
+                </div>
+              );
+            })}*/
