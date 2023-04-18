@@ -4,7 +4,8 @@ export function Button({
   buttonCaption,
   isLoading,
   onClickHandler,
-  loadingCaption
+  loadingCaption,
+  error
 }) {
   if (isLoading == true) {
     return (
@@ -43,8 +44,9 @@ export function Button({
     return (
       <button
         name="new-workout"
-        className={`${BUTTONSTYLE} mt-3 mx-1 w-auto shadow-md active:shadow-none`}
+        className={`${BUTTONSTYLE} mt-3 mx-1 w-full shadow-md active:shadow-none`}
         onClick={() => onClickHandler()}
+        disabled={error}
       >
         {buttonCaption}
       </button>

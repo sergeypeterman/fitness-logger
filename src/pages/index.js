@@ -24,11 +24,11 @@ export default function Home() {
   const [selectedProgram, setSelectedProgram] = useState("");
 
   useEffect(() => {
+    // encoding initial to prevent confusion in case there is a Program
+    //that is called "initial" by the user
     const initial = Buffer.from("initial").toString("base64");
-    const test = Buffer.from(initial, "base64").toString("ascii");
-    console.log(`${initial} encoded from ${test}`);
 
-    const response = fetch(`/api/training-data?selected=${initial}`, {
+    fetch(`/api/training-data?selected=${initial}`, {
       method: "GET",
     })
       .then((response) => response.json())
@@ -55,13 +55,15 @@ export default function Home() {
     setWorkout(wout);
   };
 
-  const updateProgram = (prg) => {
-    setSelectedProgram(prg);
+  const updateSelectedProgram = (prg) => {
+    let newPrg = new String("");
+    newPrg = newPrg.concat(prg);
+    setSelectedProgram(newPrg);
   };
 
   const updateFetched = (isFetched) => {
     setFetched(isFetched);
-  }
+  };
 
   const resetWorkout = () => {
     const blank = { ...initialWorkout };
@@ -70,9 +72,9 @@ export default function Home() {
   };
 
   const handleClick = async () => {
-    try {
-      /*Loading last workout of the selected program on "Log New Workout"
-      to ease the new input for the user.*/
+    /*try {
+      //Loading last workout of the selected program on "Log New Workout"
+      //to ease the new input for the user.
       //May be rewrited to choose a training based on reps scheme
       //omitting date, reps and rest
 
@@ -101,9 +103,9 @@ export default function Home() {
           newWorkout.id = Number(values[0]) + 1; // new id
           console.log("new id: " + newWorkout.id);
         } else if (ind === 1) {
-          /* date. Skipping old date 
-          let oldDate = new Date(values[1]).toLocaleDateString("fr-ca");
-          newWorkout.date = oldDate; */
+          //date. Skipping old date 
+          //let oldDate = new Date(values[1]).toLocaleDateString("fr-ca");
+          //newWorkout.date = oldDate; 
         } else if (ind === 2) {
           // reps
           //newWorkout.reps = values[2]; skipping old reps
@@ -126,7 +128,7 @@ export default function Home() {
         error: true,
         message: err.message,
       });
-    }
+    }*/
   };
 
   const handlePost = async () => {
@@ -175,7 +177,6 @@ export default function Home() {
       }
 
       setLoading(false); //loading done
-      setFetched(false); //reset fetch status
       resetWorkout(); //reset workout' state
     } catch (err) {
       console.log("error.message");
@@ -195,55 +196,39 @@ export default function Home() {
         <div name="logo" className="font-header text-5xl pb-5 m-auto ">
           FITNESS LOGGER
         </div>
-        <Settings
-          workout={workout}
-          updateWorkout={updateWorkout}
-          isActive={fetched}
-          program={program}
-          selectedProgram={selectedProgram}
-          updateProgram={updateProgram}
-          isLoading={isLoading}
-          updateLoading={setLoading}
-          error={error}
-          updateError={updateError}
-        />
-        {fetched ? ( //if the data is fetched, render exercises screen
-          <Fragment>
-            <Exercises
-              workout={workout}
-              updateWorkout={updateWorkout}
-            />
-            <div className="flex w-full justify-between">
-              <button
-                name="back"
-                className={`${BUTTONSTYLE} mt-3 shadow-md active:shadow-none`}
-                onClick={() => {
-                  setFetched(false);
-                  resetWorkout();
-                }}
-              >
-                Back
-              </button>
-              <Button
-                buttonCaption={"Add new Workout"}
-                isLoading={isLoading}
-                onClickHandler={handlePost}
-                loadingCaption={"Uploading Workout"}
-              />
-            </div>
-          </Fragment>
-        ) : (
-          <Fragment>
-            <Button
-              buttonCaption={"Log New Workout"}
-              isLoading={isLoading}
-              onClickHandler={handleClick}
-              loadingCaption={"Retrieving Last Workout"}
-            />
-          </Fragment>
+        {selectedProgram && (
+          <Settings
+            workout={workout}
+            updateWorkout={updateWorkout}
+            program={program}
+            selectedProgram={selectedProgram}
+            updateSelectedProgram={updateSelectedProgram}
+            isLoading={isLoading}
+            updateLoading={setLoading}
+            updateFetched={updateFetched}
+            error={error}
+            updateError={updateError}
+            resetWorkout={resetWorkout}
+          />
         )}
 
-        {error ? <div>{error.message}</div> : null}
+        <Fragment>
+          <Exercises
+            workout={workout}
+            updateWorkout={updateWorkout}
+            updateError={updateError}
+            error={error}
+          />
+          <div className="flex w-full">
+            <Button
+              buttonCaption={error ? <div>{error.message}</div> : "Add new Workout"}
+              isLoading={isLoading}
+              onClickHandler={handlePost}
+              loadingCaption={"Uploading Workout"}
+              error={error}
+            />
+          </div>
+        </Fragment>
       </div>
     </main>
   );
@@ -284,4 +269,12 @@ export default function Home() {
                   />
                 </div>
               );
-            })}*/
+            })}
+            
+            
+            <Button
+              buttonCaption={"Log New Workout"}
+              isLoading={isLoading}
+              onClickHandler={handleClick}
+              loadingCaption={"Retrieving Last Workout"}
+            />*/
