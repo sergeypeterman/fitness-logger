@@ -91,7 +91,6 @@ export function Settings({
     let isDateCorrect = checkDate(newDate, 7);
     if (isDateCorrect.dateInRange) {
       dateRef.current.className = `${buttonStyle} bg-sky-700 hover:bg-sky-900 w-2/3 `;
-      
     }
 
     newW.date = newDate;
@@ -105,24 +104,20 @@ export function Settings({
     const newDate = event.target.value;
     let newW = { ...workout };
 
+    //check if date is no more than a week forward or a year+ back
     let isDateCorrect = checkDate(newDate, 7);
 
     if (isDateCorrect.dateInRange == true) {
-      error && updateError(false); // drop date error, if any
+      error && updateError(false); // drop error, if any
       newW.date = newDate;
-    } else if (isDateCorrect.dateInRange == "year") {
-      error && updateError(false); // drop date error, if any
-      newW.date = newDate;
-      updateError(isDateCorrect.message);
     } else {
       updateError(isDateCorrect.message);
     }
 
-    if (isDateCorrect.dateInRange) {
+    if (isDateCorrect.dateInRange === true) {
       dateRef.current.className = `${buttonStyle} bg-sky-700 hover:bg-sky-900 w-2/3 `;
-      updateWorkout(newW);      
-    }
-    else{
+      updateWorkout(newW);
+    } else {
       dateRef.current.focus();
       dateRef.current.className = `${buttonStyle} bg-rose-700 hover:bg-rose-900 w-2/3 `;
     }
