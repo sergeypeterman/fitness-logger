@@ -136,10 +136,10 @@ export default function Home() {
   };
 
   return (
-    <main className="h-screen relative overflow-auto flex flex-col m-auto w-full box-border">
+    <main className="h-screen relative overflow-auto flex flex-col m-auto w-full">
       <div
         name="widget"
-        className="max-w-lg min-w-sm shadow-xl flex flex-col p-5 m-auto border-slate-400 border-2 rounded-2xl border-solid"
+        className="max-w-lg min-w-sm box-border shadow-xl flex flex-col p-5 m-auto border-slate-400 border-2 rounded-2xl border-solid"
       >
         <div name="logo" className="font-header text-5xl pb-5 m-auto ">
           FITNESS LOGGER 
