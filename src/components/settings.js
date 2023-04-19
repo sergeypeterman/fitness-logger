@@ -14,6 +14,7 @@ export function Settings({
   error,
   updateError,
   resetWorkout,
+  isFetched,
 }) {
   // component for setting the date and reps, input is disabled when it's used inside a new workout
 
@@ -23,51 +24,54 @@ export function Settings({
   const restRef = useRef();
 
   useEffect(() => {
-    updateLoading(true); //loading...
-    console.log(`sent from settings: ${selectedProgram}`);
-    fetch(`/api/training-data?selected=${selectedProgram}`, {
-      method: "GET",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        const { headers, values } = data;
-        const newWorkout = { ...workout };
-        // resetting exercises to avoid duplicating
-        if (headers.length > 0) {
-          newWorkout.exercises.length = 0;
-        }
-        //populating workout with the exercises' data and a new id
-        headers.map((item, ind) => {
-          if (ind === 0) {
-            // id
-            newWorkout.id = Number(values[0]) + 1; // new id
-            console.log("new id: " + newWorkout.id);
-          } else if (ind === 1) {
-            /* date. Skipping old date 
+    if (isFetched === 0 || isFetched === 2) {
+      updateLoading(true); //loading...
+      console.log(`sent from settings: ${selectedProgram}`);
+      fetch(`/api/training-data?selected=${selectedProgram}`, {
+        method: "GET",
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          const { headers, values } = data;
+          const newWorkout = { ...workout };
+          // resetting exercises to avoid duplicating
+          if (headers.length > 0) {
+            newWorkout.exercises.length = 0;
+          }
+          //populating workout with the exercises' data and a new id
+          headers.map((item, ind) => {
+            if (ind === 0) {
+              // id
+              newWorkout.id = Number(values[0]) + 1; // new id
+              console.log("new id: " + newWorkout.id);
+            } else if (ind === 1) {
+              /* date. Skipping old date 
           let oldDate = new Date(values[1]).toLocaleDateString("fr-ca");
           newWorkout.date = oldDate; */
-          } else if (ind === 2) {
-            // reps
-            //newWorkout.reps = values[2]; skipping old reps
-          } else if (ind === 3) {
-            // rest
-            //newWorkout.rest = values[3]; skipping old rest
-          } else {
-            let ex = new exercise(item, values[ind]);
-            newWorkout.exercises.push(ex);
-          }
+            } else if (ind === 2) {
+              // reps
+              //newWorkout.reps = values[2]; skipping old reps
+            } else if (ind === 3) {
+              // rest
+              //newWorkout.rest = values[3]; skipping old rest
+            } else {
+              let ex = new exercise(item, values[ind]);
+              newWorkout.exercises.push(ex);
+            }
+          });
+          updateWorkout(newWorkout);
+          updateFetched(1);
+        })
+        .catch((error) => {
+          console.error(error);
+          updateError({
+            error: true,
+            message: error.message,
+          });
         });
-        updateFetched(true);
-      })
-      .catch((error) => {
-        console.error(error);
-        updateError({
-          error: true,
-          message: error.message,
-        });
-      });
-    updateLoading(false);
-  }, []);
+      updateLoading(false);
+    }
+  }, [isFetched]);
 
   Date.prototype.addDays = function (days) {
     let date = new Date(this.valueOf());

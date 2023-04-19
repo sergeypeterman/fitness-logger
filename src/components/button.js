@@ -13,9 +13,9 @@ export function Button({
         disabled
         type="button"
         onClick={() => onClickHandler()}
-        className={`${BUTTONSTYLE} mt-3 mx-0 w-auto shadow-md active:shadow-none`}
+        className={`${BUTTONSTYLE} mt-3 mx-0 w-full shadow-md active:shadow-none`}
       >
-        <div className="flex items-center">
+        <div className="flex items-center justify-center">
           <svg
             className="animate-spin mr-3 h-5 w-5 text-white"
             xmlns="http://www.w3.org/2000/svg"

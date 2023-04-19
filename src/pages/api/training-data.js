@@ -1,6 +1,7 @@
 const { GoogleSpreadsheet } = require("google-spreadsheet");
 const sheetId = process.env.GOOGLE_SHEET_ID;
 const doc = new GoogleSpreadsheet(sheetId);
+import { checkIntegerRange, checkDate,  } from "@/components/functions";
 
 export default async function handler(req, res) {
   try {
@@ -16,12 +17,12 @@ export default async function handler(req, res) {
     let values = [];
     let rows; //getting rows
 
-    //if fetching with post == true , update the sheet
+    //if fetching with post == true , validate the data and update the sheet
     if (req.method == "POST") {
       const {
         query: { selected },
       } = req;
-      
+
       sheets = doc.sheetsByIndex;
       sheetTitles = sheets.map((item) => item.title);
 
@@ -37,27 +38,33 @@ export default async function handler(req, res) {
       rows = await sheet.getRows();
 
       values = [...req.body]; //reading new values and writing them to the new row
+      let valStatus = validateValues(values);
+      if (valStatus.value) {
+        const options = { raw: false, insert: false, index: 0 };
+        await sheet.addRow(values, options);
 
-      const options = { raw: false, insert: false, index: 0 };
-      await sheet.addRow(values, options);
-
-      //updating data and sheet
-      await sheet.saveUpdatedCells();
-
-      res.status(200).json({ message: "Added" });
+        //updating data and sheet
+        await sheet.saveUpdatedCells();
+        res.status(200).json({ message: "Added" });
+      } else {
+        res.status(405).end(`${valStatus.message}`);
+      }
     } else if (req.method == "GET") {
       const {
         query: { selected },
       } = req;
 
+      //reading encoded word 'initial'
       const isInitial = Buffer.from("initial").toString("base64");
 
       if (selected == isInitial) {
+        //if it's an initial request (fetched = 0)
         sheets = doc.sheetsByIndex;
         sheetTitles = sheets.map((item) => item.title);
 
         res.status(200).json({ titles: sheetTitles });
       } else if (selected) {
+        //if it's an actual data request
         sheets = doc.sheetsByIndex;
         sheetTitles = sheets.map((item) => item.title);
 
@@ -88,4 +95,16 @@ export default async function handler(req, res) {
     console.log("error api " + err);
     res.status(500).json(err);
   }
+}
+
+function validateValues(values=[]) {
+  //checking structure: 
+  //id	Date	Reps	Rest (sec)	[num, date, NumxNum, num]
+  //exercises: [number]
+
+  let result = values.reduce((item, ind) => {
+    if(ind === 0){
+      
+    }
+  }, true);
 }
