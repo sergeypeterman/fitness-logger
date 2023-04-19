@@ -5,9 +5,10 @@ export function Button({
   isLoading,
   onClickHandler,
   loadingCaption,
-  error
+  error,
+  isFetched
 }) {
-  if (isLoading == true) {
+  if (isLoading == true || isFetched != 1) {
     return (
       <button
         disabled
