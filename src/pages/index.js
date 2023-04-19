@@ -18,7 +18,7 @@ const initialWorkout = new trainingRecord(-1, today, "2x15", 120, []);
 export default function Home() {
   const [error, setError] = useState(false);
   const [workout, setWorkout] = useState(initialWorkout);
-  const [fetched, setFetched] = useState(0); // is the first button pressed
+  const [fetched, setFetched] = useState(0); // 0=initial, 1=fetched last, 2=posted
   const [isLoading, setLoading] = useState(false);
   const [program, setProgram] = useState([]);
   const [selectedProgram, setSelectedProgram] = useState("");
@@ -126,6 +126,7 @@ export default function Home() {
       setFetched(2);
       resetWorkout(); //reset workout' state
     } catch (err) {
+      setFetched(2);
       console.log("error.message");
       setError({
         error: true,
@@ -141,7 +142,7 @@ export default function Home() {
         className="max-w-lg min-w-sm shadow-xl flex flex-col p-5 m-auto border-slate-400 border-2 rounded-2xl border-solid"
       >
         <div name="logo" className="font-header text-5xl pb-5 m-auto ">
-          FITNESS LOGGER
+          FITNESS LOGGER {fetched}
         </div>
         {selectedProgram && (
           <Settings
@@ -176,6 +177,7 @@ export default function Home() {
               onClickHandler={handlePost}
               loadingCaption={"Loading Workout"}
               error={error}
+              isFetched={fetched}
             />
           </div>
         </Fragment>
