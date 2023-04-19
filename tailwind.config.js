@@ -677,7 +677,7 @@ module.exports = {
       min: 'min-content',
       max: 'max-content',
       fit: 'fit-content',
-      sm: '24rem',
+      sm: '20rem',
     },
     objectPosition: {
       bottom: 'bottom',
