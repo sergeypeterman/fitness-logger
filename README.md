@@ -12,6 +12,9 @@ The data entered is verified for validity in real-time on the client side, as we
 If the data is deemed valid, a new row is created to represent the new logged workout.
 
 ![submit](https://user-images.githubusercontent.com/112394347/233693111-c2beae27-90a4-4fb1-9340-6efdef491702.gif)
+
+↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+
 ![addrow](https://user-images.githubusercontent.com/112394347/233693123-23bdf15f-8cbd-4e88-9c19-406fe589d84a.gif)
 
 While this project was developed for my personal use, it serves as a compelling demonstration of my capacity to effectively use popular frontend technologies to create practical applications. I am eager to bring my skills and enthusiasm to your IT team and continue honing my abilities as a frontend developer.
