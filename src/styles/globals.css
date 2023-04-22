@@ -37,4 +37,13 @@ body {
     -webkit-appearance: none;
     -moz-appearance: textfield !important;
   }
+  input[type="date"]
+{
+    display:block;
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+    min-height: 1.2em;
 }
+}
+
+
