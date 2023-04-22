@@ -27,8 +27,8 @@ export default function Home() {
     // encoding initial to prevent confusion in case there is a Program
     //that is called "initial" by the user
     if (fetched === 0) {
-
-      console.log('loading from Home (initial)');
+      console.log("loading from Home (initial)");
+      let resError;
 
       const initial = Buffer.from("initial").toString("base64");
       setLoading(true);
@@ -38,12 +38,24 @@ export default function Home() {
         .then((response) => response.json())
         .then((data) => {
           const { titles } = data;
-          setProgram(titles);
-          setSelectedProgram(titles[0]);
-          console.log(titles[0]);
+          if (titles) {
+            setProgram(titles);
+            setSelectedProgram(titles[0]);
+            console.log(titles[0]);
+            setError(false);
+          } else {
+            console.log(data);
+            resError = new String(data);
+            setError({
+              error: true,
+              message: resError,
+            });
+            setLoading(false);
+          }
         })
         .catch((error) => {
           console.error(error);
+          setLoading(false);
           setError({
             error: true,
             message: error.message,
@@ -118,20 +130,28 @@ export default function Home() {
       );
 
       if (!response.ok) {
-        console.log(response.statusText);
+        console.log(`index - ${response.statusText}`);
+        setError({
+          error: true,
+          message: response.statusText,
+        });
+        setFetched(2);
         throw new Error(response.statusText);
       }
 
       setLoading(false); //loading done
       setFetched(2);
+      setError(false);
       resetWorkout(); //reset workout' state
     } catch (err) {
       setFetched(2);
-      console.log("error.message");
-      setError({
+      setLoading(false);
+      console.log(error.message);
+      console.log(typeof error.message);
+      /*setError({
         error: true,
-        message: err.message,
-      });
+        message: String(err.message),
+      });*/
     }
   };
 
@@ -141,8 +161,16 @@ export default function Home() {
         name="widget"
         className="max-w-lg min-w-sm box-border shadow-xl flex flex-col p-5 m-auto border-slate-400 border-2 rounded-2xl border-solid"
       >
-        <div name="logo" className="font-header text-5xl pb-5 m-auto ">
-          FITNESS LOGGER 
+        <div name="logo" className="font-header text-5xl m-auto ">
+          FITNESS LOGGER
+        </div>
+        <div className={error ? null : "invisible"}>
+          <p
+            className="m-auto h-6 w-3/4 flex justify-center items-center
+          border-rose-300 text-rose-600 border-2 rounded-md border-solid"
+          >
+            {error ? String(error.message) : null}
+          </p>
         </div>
         {selectedProgram && (
           <Settings
@@ -171,11 +199,13 @@ export default function Home() {
           <div className="flex w-full">
             <Button
               buttonCaption={
-                error ? <div>{error.message}</div> : "Add new Workout"
+                error ? <div>{String(error.message)}</div> : "Add new Workout"
               }
               isLoading={isLoading}
               onClickHandler={handlePost}
-              loadingCaption={"Loading Workout"}
+              loadingCaption={
+                error ? <div>{String(error.message)}</div> : "Loading Workout"
+              }
               error={error}
               isFetched={fetched}
             />

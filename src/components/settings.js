@@ -136,7 +136,7 @@ export function Settings({
       ? (newRepsArr[1] = newReps)
       : updateError(inputCheck.message);
 
-    newReps == "" && updateError("Reps are empty");
+    newReps == "" && updateError("Check Reps value");
     if (inputCheck.intInRange) {
       repsRef.current.className = `${smButtonStyle} bg-sky-700 hover:bg-sky-900 ml-1`;
     }
@@ -158,7 +158,7 @@ export function Settings({
       ? (newRepsArr[1] = newReps)
       : updateError(inputCheck.message);
 
-    newReps == "" && updateError("Reps are empty");
+    newReps == "" && updateError("Check Reps value");
 
     if (!inputCheck.intInRange || newReps == "") {
       repsRef.current.focus();
@@ -184,7 +184,7 @@ export function Settings({
       ? (newRepsArr[0] = newSets)
       : updateError(inputCheck.message);
 
-    newSets == "" && updateError("Sets are empty");
+    newSets == "" && updateError("Check Sets value");
     if (inputCheck.intInRange) {
       setsRef.current.className = `${smButtonStyle} bg-sky-700 hover:bg-sky-900 mr-1`;
     }
@@ -206,7 +206,7 @@ export function Settings({
       ? (newRepsArr[0] = newSets)
       : updateError(inputCheck.message);
 
-    newSets == "" && updateError("Sets are empty");
+    newSets == "" && updateError("Check Sets value");
 
     if (!inputCheck.intInRange || newSets == "") {
       setsRef.current.focus();
@@ -303,7 +303,7 @@ export function Settings({
       ? (newW.rest = newRest)
       : updateError(inputCheck.message);
 
-    newRest == "" && updateError("Rest is empty");
+    newRest == "" && updateError("Check Rest' value");
 
     if (inputCheck.intInRange) {
       restRef.current.className = `${buttonStyle} bg-sky-700 hover:bg-sky-900 w-2/3`;
@@ -323,7 +323,7 @@ export function Settings({
       ? (newW.rest = newRest)
       : updateError(inputCheck.message);
 
-    newRest == "" && updateError("Rest is empty");
+    newRest == "" && updateError("Check Rest' value");
 
     if (!inputCheck.intInRange || newRest === "") {
       restRef.current.className = `${buttonStyle} bg-rose-700 hover:bg-rose-900 w-2/3`;

@@ -61,7 +61,7 @@ function ExerciseValue({
       ? setExerciseValue(num)
       : updateError(inputCheck.message);
 
-    num == "" && updateError(`${name} is empty`);
+    num == "" && updateError(`Check ${name} value`);
 
     if (inputCheck.intInRange) {
       exRef.current.className = `${buttonStyle} bg-sky-700 hover:bg-sky-900 w-1/3`;
@@ -81,7 +81,7 @@ function ExerciseValue({
       ? setExerciseValue(num)
       : updateError(inputCheck.message);
 
-    num == "" && updateError(`${name} is empty`);
+    num == "" && updateError(`Check ${name} value`);
 
     if (!inputCheck.intInRange || num === "") {
       exRef.current.className = `${buttonStyle} bg-rose-700 hover:bg-rose-900 w-1/3`;

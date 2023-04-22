@@ -97,8 +97,10 @@ export default async function handler(req, res) {
       res.status(405).end(`${req.method} Not Allowed`);
     }
   } catch (err) {
-    console.log("error api " + err);
-    res.status(500).json(err);
+    console.log("error api " + err + err.code);
+    console.log(err);
+    console.log(typeof err);
+    err.errno === "ENOTFOUND" ? res.status(503).json("Looks like you're offline") : res.status(500).json(err);
   }
 }
 
