@@ -1,5 +1,8 @@
 As a frontend developer with a passion for fitness, I have created a pet-project on GitHub using Next.js and React to simplify the process of tracking my workouts. The project employs Google Sheets as a database and includes a straightforward interface that allows me to select a pre-designed fitness program from a Google Sheet and enter specific details for each exercise, including sets, repetitions, and rest periods.
 
+The app is available here:
+https://fitness-logger.vercel.app/
+
 To ensure the security of my Google API keys, I have utilized Next.js's serverless function and encryption capabilities. The project makes it easy for me to retrieve a list of exercises from the sheet and input my workout data, with the option to upload it to the sheet after completion.
 
 The user begins by opening the page and completing the form by selecting a workout program, providing a date, and defining the volume and rest period. Then, the workload must be filled out for each exercise. To assist the user in filling out the numbers, the application presents data from the last workout submitted to the database (Google Sheet). The app dynamically reads the workout programs and exercises lists from the worksheet names and the header row, respectively, of the Google sheet provided.
