@@ -148,15 +148,26 @@ export default function Home() {
       setLoading(false);
       console.log(error.message);
       console.log(typeof error.message);
-      /*setError({
+      setError({
         error: true,
         message: String(err.message),
-      });*/
+      });
     }
   };
 
   return (
     <main className="h-screen relative overflow-auto flex flex-col m-auto w-full">
+      <div className="static">
+        <p
+          className={
+            !error && fetched === 2
+              ? "transition duration-1000 ease-in-out m-auto py-3 w-1/2 flex fixed top-10 left-1/2 -translate-y-1/2 -translate-x-1/2 z-10 justify-center items-center bg-green-600 text-white rounded-md"
+              : "transition duration-100 ease-in-out opacity-0 m-auto py-3 w-1/2 flex fixed top-10 left-1/2 -translate-y-1/2 -translate-x-1/2 z-10 justify-center items-center bg-green-600 text-white rounded-md"
+          }
+        >
+          {!error && fetched === 2 ? "Logged successfully":null}
+        </p>
+      </div>
       <div
         name="widget"
         className="max-w-lg min-w-sm box-border shadow-xl flex flex-col p-5 m-auto border-slate-400 border-2 rounded-2xl border-solid"
@@ -208,7 +219,7 @@ export default function Home() {
               }
               error={error}
               isFetched={fetched}
-              buttonId = 'submit'
+              buttonId="submit"
             />
           </div>
         </Fragment>
@@ -216,3 +227,4 @@ export default function Home() {
     </main>
   );
 }
+/*{!error && fetched===2 ? null : null}*/
