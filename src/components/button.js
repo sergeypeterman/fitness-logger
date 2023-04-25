@@ -6,11 +6,13 @@ export function Button({
   onClickHandler,
   loadingCaption,
   error,
-  isFetched
+  isFetched,
+  buttonId
 }) {
   if (isLoading == true || isFetched != 1) {
     return (
       <button
+        name={buttonId}
         disabled
         type="button"
         onClick={() => onClickHandler()}
@@ -44,7 +46,7 @@ export function Button({
   } else {
     return (
       <button
-        name="new-workout"
+        name={buttonId}
         className={`${BUTTONSTYLE} mt-3 mx-1 w-full shadow-md active:shadow-none`}
         onClick={() => onClickHandler()}
         disabled={error}

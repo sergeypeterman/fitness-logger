@@ -66,12 +66,15 @@ export function checkDate(newDate, rangeDate) {
     let newValues = [...values];
   
     console.log(values);
-    if (values.length > 0) {
+    if (values.length > 4) {
       let result = values.reduce((res, item, ind) => {
         let inRange;
   
+        if(item === ""){
+          return false;
+        }
         console.log(`Reduce, ind = ${ind} item = ${item} result = ${res}`);
-  
+        
         if (ind === 0) {
           //id
           newValues[ind] = Number(item);

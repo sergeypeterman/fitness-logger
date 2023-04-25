@@ -1,7 +1,11 @@
 const { GoogleSpreadsheet } = require("google-spreadsheet");
 const sheetId = process.env.GOOGLE_SHEET_ID;
 const doc = new GoogleSpreadsheet(sheetId);
-import { validateValues, checkIntegerRange, checkDate } from "@/components/functions";
+import {
+  validateValues,
+  checkIntegerRange,
+  checkDate,
+} from "@/components/functions";
 
 export default async function handler(req, res) {
   try {
@@ -28,8 +32,8 @@ export default async function handler(req, res) {
 
       const programIndex = sheetTitles.indexOf(selected);
 
-      console.log(sheetTitles);
-      console.log(`${selected} ' index = ${programIndex}`);
+      /*console.log(sheetTitles);
+      console.log(`${selected} ' index = ${programIndex}`);*/
 
       sheet = doc.sheetsByIndex[programIndex];
       await sheet.loadCells();
@@ -52,7 +56,7 @@ export default async function handler(req, res) {
         await sheet.saveUpdatedCells();
         res.status(200).json({ message: "Added" });
       } else {
-        res.status(405).end(`${valStatus.message}`);
+        res.status(400).end(`${valStatus.message}`);
       }
     } else if (req.method == "GET") {
       const {
@@ -75,8 +79,8 @@ export default async function handler(req, res) {
 
         const programIndex = sheetTitles.indexOf(selected);
 
-        console.log(sheetTitles);
-        console.log(`${selected} ' index = ${programIndex}`);
+        /*console.log(sheetTitles);
+        console.log(`${selected} ' index = ${programIndex}`);*/
 
         sheet = doc.sheetsByIndex[programIndex];
 
@@ -88,13 +92,18 @@ export default async function handler(req, res) {
         } else {
           sheet.headerValues.map((item, ind) => (values[ind] = 0));
         }
-        //sending headers and corresponding values
-        res.status(200).json({ headers: sheet.headerValues, values: values });
+        //sending headers and corresponding values, if there are >4 headers
+        // if <= 4 headers, error, there are no exercises
+        let hValues = [...sheet.headerValues];
+
+        hValues.length > 4
+          ? res.status(200).json({ headers: hValues, values: values })
+          : res.status(500).end("Not enough data in the sheet");
       } else {
-        res.status(405).end(`Unknown Program selected`);
+        res.status(400).end(`Unknown Program selected`);
       }
     } else {
-      res.status(405).end(`${req.method} Not Allowed`);
+      res.status(400).end(`${req.method} Not Allowed`);
     }
   } catch (err) {
     console.log("error api " + err + err.code);
@@ -105,5 +114,3 @@ export default async function handler(req, res) {
       : res.status(500).json(err);
   }
 }
-
-
