@@ -1,7 +1,7 @@
 const { GoogleSpreadsheet } = require("google-spreadsheet");
 const sheetId = process.env.GOOGLE_SHEET_ID;
 const doc = new GoogleSpreadsheet(sheetId);
-import { checkIntegerRange, checkDate } from "@/components/functions";
+import { validateValues, checkIntegerRange, checkDate } from "@/components/functions";
 
 export default async function handler(req, res) {
   try {
@@ -100,52 +100,10 @@ export default async function handler(req, res) {
     console.log("error api " + err + err.code);
     console.log(err);
     console.log(typeof err);
-    err.errno === "ENOTFOUND" ? res.status(503).json("Looks like you're offline") : res.status(500).json(err);
+    err.errno === "ENOTFOUND"
+      ? res.status(503).json("Looks like you're offline")
+      : res.status(500).json(err);
   }
 }
 
-function validateValues(values) {
-  //checking structure and normalizing type:
-  //id	Date	Reps	Rest (sec)	[num, date, NumxNum, num]
-  //exercises: [num]
 
-  let message = "";
-  let newValues = [...values];
-
-  console.log(values);
-  let result = values.reduce((res, item, ind) => {
-    let inRange;
-
-    console.log(`Reduce, ind = ${ind} item = ${item} result = ${res}`);
-
-    if (ind === 0) {
-      //id
-      newValues[ind] = Number(item);
-      inRange = checkIntegerRange(newValues[ind], 0, 500000); // 5.000.000 cells / 10 columns
-      return res && inRange.intInRange;
-    } else if (ind === 1) {
-      //date
-      inRange = checkDate(item, 7);
-      inRange.dateInRange = inRange.dateInRange === true ? true : false;
-      return res && inRange.dateInRange;
-    } else if (ind === 2) {
-      //reps
-      let repsArr = item.split("x");
-      inRange = checkIntegerRange(Number(repsArr[0]), 0, 99);
-      if (inRange.intInRange) {
-        inRange = checkIntegerRange(Number(repsArr[1]), 0, 999);
-        return res && inRange.intInRange;
-      } else {
-        return false;
-      }
-    } else {
-      //exercises and rest
-      newValues[ind] = Number(item);
-      inRange = checkIntegerRange(newValues[ind], 0, 999);
-      return res && inRange.intInRange;
-    }
-  }, true);
-  console.log(newValues);
-  message = result ? "API: correct data" : "API: wrong data input";
-  return { value: result, message: message, newValues: newValues };
-}
