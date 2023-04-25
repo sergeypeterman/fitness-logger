@@ -18,11 +18,13 @@ export function Settings({
 }) {
   // component for setting the date and reps, input is disabled when it's used inside a new workout
 
+  // for changing classnames on the fly
   const dateRef = useRef();
   const repsRef = useRef();
   const setsRef = useRef();
   const restRef = useRef();
 
+  //loading default program
   useEffect(() => {
     if (isFetched === 0 || isFetched === 2) {
       updateLoading(true); //loading...
@@ -73,17 +75,19 @@ export function Settings({
     }
   }, [isFetched]);
 
+  //extending Date object
   Date.prototype.addDays = function (days) {
     let date = new Date(this.valueOf());
     date.setDate(date.getDate() + days);
     return date;
   };
 
-  // log workout no more than a week forward
+  // log workout no more than a week forward,
+  // fr-ca for a format compatible with <input date>
   const maxDate = new Date().addDays(7).toLocaleDateString("fr-ca");
 
   const handleDate = (event) => {
-    //handling date input
+    //handling date input, no more than 7 days forward
 
     const newDate = event.target.value;
     let newW = { ...workout };
@@ -99,7 +103,7 @@ export function Settings({
   };
 
   const handleDateBlur = (event) => {
-    //handling date input
+    //handling date input on switching input fields
 
     const newDate = event.target.value;
     let newW = { ...workout };
@@ -147,6 +151,7 @@ export function Settings({
   };
 
   const handleRepsBlur = (event) => {
+    //handling reps part of Reps input on blur
     let newW = { ...workout };
     let newReps = event.target.value;
     let newRepsArr = newW.reps.split("x");
@@ -195,6 +200,7 @@ export function Settings({
   };
 
   const handleSetsBlur = (event) => {
+    //handling sets part of Reps input on blur
     let newW = { ...workout };
     let newSets = event.target.value;
     let newRepsArr = newW.reps.split("x");
@@ -220,6 +226,7 @@ export function Settings({
   };
 
   const handleProgram = async (event) => {
+    // handling program change => download a new one from the sheet
     const newProgram = event.target.value;
 
     updateSelectedProgram(newProgram);
@@ -292,7 +299,7 @@ export function Settings({
   const smButtonStyle = `text-center px-5 py-3 w-1/2 text-white rounded-lg text-lg`;
 
   const handleRest = (event) => {
-    //handling date input
+    //handling Rest input
     const newRest = event.target.value;
     let newW = { ...workout };
 
@@ -313,6 +320,7 @@ export function Settings({
   };
 
   const handleRestBlur = (event) => {
+    //handling Rest input on blur
     const newRest = event.target.value;
     let newW = { ...workout };
 
@@ -338,9 +346,12 @@ export function Settings({
   return (
     <div name="settings" className="w-full">
       <div className="flex flex-row ">
-        <div className={tagStyle}>Program</div>
+        <label for="programSelector" className={tagStyle}>
+          Program
+        </label>
         <select
           type="text"
+          name="programSelector"
           onChange={handleProgram}
           value={selectedProgram}
           className={`${buttonStyle} bg-sky-700 hover:bg-sky-900 w-2/3 `}
@@ -351,9 +362,12 @@ export function Settings({
         </select>
       </div>
       <div className="flex flex-row">
-        <div className={tagStyle}>Date</div>
+        <label for="dateSelector" className={tagStyle}>
+          Date
+        </label>
         <input
           type="date"
+          name="dateSelector"
           max={maxDate}
           onChange={handleDate}
           onBlur={handleDateBlur}
@@ -362,10 +376,11 @@ export function Settings({
           ref={dateRef}
         />
       </div>
-      <div className="flex flex-row">
-        <div className={`${tagStyle}`}>Reps</div>
+      <fieldset className="flex flex-row">
+        <legend className={`${tagStyle} float-left`}>Reps x Sets</legend>
         <div className="flex flex-row justify-between w-2/3 m-1">
           <input
+            name="setsSelector"
             className={`${smButtonStyle} bg-sky-700 hover:bg-sky-900 mr-1`}
             type="number"
             value={setRep[0]}
@@ -374,6 +389,7 @@ export function Settings({
             ref={setsRef}
           />
           <input
+            name="repsSelector"
             className={`${smButtonStyle} bg-sky-700 hover:bg-sky-900 ml-1`}
             type="number"
             value={setRep[1]}
@@ -382,10 +398,11 @@ export function Settings({
             ref={repsRef}
           />
         </div>
-      </div>
+      </fieldset>
       <div className="flex flex-row">
-        <div className={tagStyle}>Rest (sec)</div>
+        <label for="restSelector" className={tagStyle}>Rest (sec)</label>
         <input
+          name="restSelector"
           type="number"
           onChange={handleRest}
           onBlur={handleRestBlur}
