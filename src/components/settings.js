@@ -16,7 +16,7 @@ export function Settings({
   resetWorkout,
   isFetched,
 }) {
-  // component for setting the date and reps, input is disabled when it's used inside a new workout
+  // component for setting the date, reps, and rest period
 
   // for changing classnames on the fly
   const dateRef = useRef();
@@ -35,6 +35,8 @@ export function Settings({
         .then((response) => response.json())
         .then((data) => {
           const { headers, values } = data;
+          console.log(headers);
+          console.log(values);
           const newWorkout = { ...workout };
           // resetting exercises to avoid duplicating
           if (headers.length > 0) {
@@ -346,12 +348,13 @@ export function Settings({
   return (
     <div name="settings" className="w-full">
       <div className="flex flex-row ">
-        <label for="programSelector" className={tagStyle}>
+        <label htmlFor="program-selector" className={tagStyle}>
           Program
         </label>
         <select
           type="text"
           name="programSelector"
+          id="program-selector"
           onChange={handleProgram}
           value={selectedProgram}
           className={`${buttonStyle} bg-sky-700 hover:bg-sky-900 w-2/3 `}
@@ -362,12 +365,13 @@ export function Settings({
         </select>
       </div>
       <div className="flex flex-row">
-        <label for="dateSelector" className={tagStyle}>
+        <label htmlFor="date-selector" className={tagStyle}>
           Date
         </label>
         <input
           type="date"
           name="dateSelector"
+          id="date-selector"
           max={maxDate}
           onChange={handleDate}
           onBlur={handleDateBlur}
@@ -376,8 +380,8 @@ export function Settings({
           ref={dateRef}
         />
       </div>
-      <fieldset className="flex flex-row">
-        <legend className={`${tagStyle} float-left`}>Reps x Sets</legend>
+      <form className="flex flex-row">
+        <label id="repsSetsSelector" className={`${tagStyle}`}>Reps x Sets</label>
         <div className="flex flex-row justify-between w-2/3 m-1">
           <input
             name="setsSelector"
@@ -387,6 +391,7 @@ export function Settings({
             onChange={handleSets}
             onBlur={handleSetsBlur}
             ref={setsRef}
+            aria-labelledby="repsSetsSelector"
           />
           <input
             name="repsSelector"
@@ -396,13 +401,15 @@ export function Settings({
             onChange={handleReps}
             onBlur={handleRepsBlur}
             ref={repsRef}
+            aria-labelledby="repsSetsSelector"
           />
         </div>
-      </fieldset>
+      </form>
       <div className="flex flex-row">
-        <label for="restSelector" className={tagStyle}>Rest (sec)</label>
+        <label htmlFor="rest-selector" className={tagStyle}>Rest (sec)</label>
         <input
           name="restSelector"
+          id="rest-selector"
           type="number"
           onChange={handleRest}
           onBlur={handleRestBlur}

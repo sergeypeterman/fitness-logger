@@ -88,9 +88,9 @@ export function checkDate(newDate, rangeDate) {
         } else if (ind === 2) {
           //reps
           let repsArr = item.split("x");
-          inRange = checkIntegerRange(Number(repsArr[0]), 0, 99);
+          inRange = checkIntegerRange(Number(repsArr[0]), 1, 99);
           if (inRange.intInRange) {
-            inRange = checkIntegerRange(Number(repsArr[1]), 0, 999);
+            inRange = checkIntegerRange(Number(repsArr[1]), 1, 999);
             return res && inRange.intInRange;
           } else {
             return false;
