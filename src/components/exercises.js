@@ -20,13 +20,14 @@ export function Exercises({ workout, updateWorkout, updateError, error }) {
         return (
           <div name="exercises" className="flex flex-row w-full " key={ind}>
             <label
-              for={`exercise-${ind}-${item.name}`}
+              htmlFor={`exercise-${ind}`}
               className={`${TAGSTYLE} w-2/3 `}
             >
               {item.name}
             </label>
             <ExerciseValue
-              key={`exercise-${ind}-${item.name}`}
+              key={`exercise-${ind}`}
+              id={`exercise-${ind}`}
               ind={ind}
               workload={item.workload}
               handleExercise={handleExercise}
@@ -48,6 +49,7 @@ function ExerciseValue({
   name,
   updateError,
   error,
+  id
 }) {
   const [exerciseValue, setExerciseValue] = useState(workload);
 
@@ -107,6 +109,7 @@ function ExerciseValue({
       onChange={(e) => handleExerciseValue(e)}
       onBlur={(e) => handleExerciseBlur(e)}
       ref={exRef}
+      id={id}
     />
   );
 }

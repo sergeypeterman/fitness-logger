@@ -24,7 +24,7 @@ export default function Home() {
   const [selectedProgram, setSelectedProgram] = useState("");
 
   useEffect(() => {
-    // encoding initial to prevent confusion in case there is a Program
+    // encoding 'initial' to base64 to prevent confusion in case there is a Program
     //that is called "initial" by the user
     if (fetched === 0) {
       console.log("loading from Home (initial)");
@@ -41,7 +41,7 @@ export default function Home() {
           if (titles) {
             setProgram(titles);
             setSelectedProgram(titles[0]);
-            console.log(titles[0]);
+            console.log(titles);
             setError(false);
           } else {
             console.log(data);
@@ -227,4 +227,3 @@ export default function Home() {
     </main>
   );
 }
-/*{!error && fetched===2 ? null : null}*/
