@@ -1,5 +1,23 @@
+export function validateDateString(year, month, day) {
+  // checking if the date exists. Eg Feb 30, Apr 31 and so on,
+  let y = Number(year);
+  y > 0 && y < 100 ? (y += 1900) : (y = y); // if year is from 0000 to 0100 it's treated like 19xx
+  const m = Number(month) - 1;
+  const d = Number(day);
+
+  const validDate = new Date(y, m, d);
+
+  //console.log(`year: ${year}, y: ${y}, validDate: ${validDate}`);
+
+  let yearMatches = validDate.getFullYear() === y;
+  let monthMatches = validDate.getMonth() === m;
+  let dayMatches = validDate.getDate() === d;
+
+  return yearMatches && monthMatches && dayMatches;
+}
+
 export function checkDate(newDate, rangeDate) {
-  // log workout no more than a rangeDate forward
+  // log workout no more than a rangeDate days forward and no earlier that last year
 
   const today = new Date().toLocaleDateString("fr-ca").split("-");
 
@@ -29,19 +47,6 @@ export function checkDate(newDate, rangeDate) {
   }
 }
 
-export function validateDateString(year, month, day) {
-  const y = Number(year);
-  const m = Number(month);
-  const d = Number(day);
-  const validDate = new Date(y, m, d);
-
-  let yearMatches = validDate.getFullYear() == y;
-  let monthMatches = validDate.getMonth() == m;
-  let dayMatches = validDate.getDate() == d;
-
-  return yearMatches && monthMatches && dayMatches;
-}
-
 export function checkIntegerRange(input, min, max) {
   if (Number.isInteger(input)) {
     if (input > max) {
@@ -60,6 +65,11 @@ export function validateValues(values) {
   //checking structure and normalizing type:
   //id	Date	Reps	Rest (sec)	[num, date, NumxNum, num]
   //exercises: [num]
+  /* return { 
+    value: result (bool),
+    message: message(string),
+    newValues: newValues([], new normalized array), 
+    errorIndices:errorIndices ([bool], validation result on every 'values' element)} */
 
   let message = "";
   let newValues = [...values];
@@ -100,7 +110,6 @@ export function validateValues(values) {
           errorIndices.push(inRange.intInRange);
           return res && inRange.intInRange;
         } else {
-
           errorIndices.push(false);
           return false;
         }
@@ -115,13 +124,35 @@ export function validateValues(values) {
     }, true);
     console.log(newValues);
     message = result ? "API: correct data" : "API: wrong data input";
-    return { value: result, message: message, newValues: newValues, errorIndices:errorIndices };
+    return {
+      value: result,
+      message: message,
+      newValues: newValues,
+      errorIndices: errorIndices,
+    };
   } else {
     return {
       value: false,
       message: "API: not enough data to post",
       newValues: [],
-      errorIndices: errorIndices,
+      errorIndices: [],
     };
   }
 }
+
+//extending Date object
+Date.prototype.addDays = function (days) {
+  let date = new Date(this.valueOf());
+  date.setDate(date.getDate() + days);
+  //console.log(date);
+  return date;
+};
+//extending Date object
+Date.prototype.addDate = function (years, months, days) {
+  let date = new Date(this.valueOf());
+  date.setFullYear(date.getFullYear() + years);
+  date.setMonth(date.getMonth() + months);
+  date.setDate(date.getDate() + days);
+  //console.log(date);
+  return date;
+};

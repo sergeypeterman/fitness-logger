@@ -56,7 +56,7 @@ describe("FitnessLogger markup", () => {
     await act(async () => render(<Home />));
 
     //const exercise0 = screen.getByRole("spinbutton",{name:headers[5], exact: false});
-    
+
     //skipping id as it's not presented on the screen
     for (let i = 1; i < headers.length; i++) {
       const item = headers[i];
@@ -76,3 +76,4 @@ describe("FitnessLogger markup", () => {
     }
   });
 });
+

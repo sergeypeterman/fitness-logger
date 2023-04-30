@@ -8,6 +8,7 @@ import {
 } from "../components/constants";
 import { Button } from "@/components/button.js";
 import { Exercises } from "@/components/exercises";
+import "@/components/";
 
 //////////////////////***************************************/
 const today = new Date().toLocaleDateString("fr-ca");
@@ -165,7 +166,7 @@ export default function Home() {
               : "transition duration-100 ease-in-out opacity-0 m-auto py-3 w-1/2 flex fixed top-10 left-1/2 -translate-y-1/2 -translate-x-1/2 z-10 justify-center items-center bg-green-600 text-white rounded-md"
           }
         >
-          {!error && fetched === 2 ? "Logged successfully":null}
+          {!error && fetched === 2 ? "Logged successfully" : null}
         </p>
       </div>
       <div
