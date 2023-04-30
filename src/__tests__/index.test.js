@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import renderer from "react-test-renderer";
+//import renderer from "react-test-renderer";
 import Home from "@/pages";
 import {
   act,
@@ -51,17 +51,20 @@ global.fetch = jest.fn((url) => {
   }
 });
 
-describe("FitnessLogger", () => {
+describe("FitnessLogger markup", () => {
   it("renders Home labels correctly", async () => {
     await act(async () => render(<Home />));
 
     //const exercise0 = screen.getByRole("spinbutton",{name:headers[5], exact: false});
+    
+    //skipping id as it's not presented on the screen
     for (let i = 1; i < headers.length; i++) {
       const item = headers[i];
       const currentField = screen.getAllByLabelText(item, { exact: false });
       expect(currentField[0]).toBeInTheDocument();
     }
   });
+
   it("renders Home exercises correctly", async () => {
     await act(async () => render(<Home />));
 
