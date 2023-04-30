@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { exercise, trainingRecord, TAGSTYLE, BUTTONSTYLE } from "./constants";
 import { checkDate, checkIntegerRange } from "./functions";
+import "./functions";
 
 export function Settings({
   workout,
@@ -76,13 +77,6 @@ export function Settings({
       updateLoading(false);
     }
   }, [isFetched]);
-
-  //extending Date object
-  Date.prototype.addDays = function (days) {
-    let date = new Date(this.valueOf());
-    date.setDate(date.getDate() + days);
-    return date;
-  };
 
   // log workout no more than a week forward,
   // fr-ca for a format compatible with <input date>
@@ -381,7 +375,9 @@ export function Settings({
         />
       </div>
       <form className="flex flex-row">
-        <label id="repsSetsSelector" className={`${tagStyle}`}>Reps x Sets</label>
+        <label id="repsSetsSelector" className={`${tagStyle}`}>
+          Reps x Sets
+        </label>
         <div className="flex flex-row justify-between w-2/3 m-1">
           <input
             name="setsSelector"
@@ -406,7 +402,9 @@ export function Settings({
         </div>
       </form>
       <div className="flex flex-row">
-        <label htmlFor="rest-selector" className={tagStyle}>Rest (sec)</label>
+        <label htmlFor="rest-selector" className={tagStyle}>
+          Rest (sec)
+        </label>
         <input
           name="restSelector"
           id="rest-selector"
