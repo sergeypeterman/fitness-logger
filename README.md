@@ -11,16 +11,16 @@ The user begins by opening the page and completing the form by selecting a worko
 
 When the user enters data in the application, it is validated for correctness in real-time on the client side. If any of the fields contain incorrect data, the field will be highlighted in red and an error message will be displayed. The user will not be able to proceed until they provide the correct input. Once the data is correct, it can be submitted by clicking the "Add new Workout" button.
 
-![fillingout](https://user-images.githubusercontent.com/112394347/233692987-d733d15f-8e03-485a-951e-10258d0f865d.gif)
+![fillout](https://user-images.githubusercontent.com/112394347/235788718-40e450f0-6376-4ded-a395-909edf2a939d.gif)
 
 After the data is submitted, it is verified again by a serverless function. The function checks the data for correctness after the API call but before the data is uploaded to the spreadsheet. This ensures that only valid data is stored in the spreadsheet.
 
 If the data is deemed valid, a new row is created to represent the new logged workout.
 
-![submit](https://user-images.githubusercontent.com/112394347/233693111-c2beae27-90a4-4fb1-9340-6efdef491702.gif)
+![load](https://user-images.githubusercontent.com/112394347/235788748-a649f29f-dd71-462a-8122-c9b2c1a9c19a.gif)
 
 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 
-![addrow](https://user-images.githubusercontent.com/112394347/233693123-23bdf15f-8cbd-4e88-9c19-406fe589d84a.gif)
+![addrow](https://user-images.githubusercontent.com/112394347/235788798-66e56a43-d641-4098-97ef-1b3212a0922c.gif)
 
 While this project was developed for my personal use, it serves as a compelling demonstration of my capacity to effectively use popular frontend technologies to create practical applications. I am eager to bring my skills and enthusiasm to your IT team and continue honing my abilities as a frontend developer.
