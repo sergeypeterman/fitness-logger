@@ -26,7 +26,7 @@ export function Exercises({ workout, updateWorkout, updateError, error }) {
               {item.name}
             </label>
             <ExerciseValue
-              key={`exercise-${ind}`}
+              key={`exercise-${ind}-${item.name}`}
               id={`exercise-${ind}`}
               ind={ind}
               workload={item.workload}
