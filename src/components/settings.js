@@ -55,10 +55,10 @@ export function Settings({
           newWorkout.date = oldDate; */
             } else if (ind === 2) {
               // reps
-              //newWorkout.reps = values[2]; skipping old reps
+              newWorkout.reps = values[2]; //skipping old reps
             } else if (ind === 3) {
               // rest
-              //newWorkout.rest = values[3]; skipping old rest
+              newWorkout.rest = values[3]; //skipping old rest
             } else {
               let ex = new exercise(item, values[ind]);
               newWorkout.exercises.push(ex);
@@ -262,10 +262,10 @@ export function Settings({
           newWorkout.date = oldDate; */
         } else if (ind === 2) {
           // reps
-          //newWorkout.reps = values[2]; skipping old reps
+          newWorkout.reps = values[2];// skipping old reps
         } else if (ind === 3) {
           // rest
-          //newWorkout.rest = values[3]; skipping old rest
+          newWorkout.rest = values[3];// skipping old rest
         } else {
           let ex = new exercise(item, values[ind]);
           newWorkout.exercises.push(ex);
