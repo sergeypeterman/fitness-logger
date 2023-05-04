@@ -104,6 +104,7 @@ function ExerciseValue({
     <input
       name={`exercise-${ind}-${name}`}
       type="number"
+      placeholder = "0-999"
       value={exerciseValue}
       className={`${buttonStyle} bg-sky-700 hover:bg-sky-900 w-1/3`}
       onChange={(e) => handleExerciseValue(e)}
