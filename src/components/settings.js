@@ -384,6 +384,7 @@ export function Settings({
             className={`${smButtonStyle} bg-sky-700 hover:bg-sky-900 mr-1`}
             type="number"
             value={setRep[0]}
+            placeholder = "0-99"
             onChange={handleSets}
             onBlur={handleSetsBlur}
             ref={setsRef}
@@ -394,6 +395,7 @@ export function Settings({
             className={`${smButtonStyle} bg-sky-700 hover:bg-sky-900 ml-1`}
             type="number"
             value={setRep[1]}
+            placeholder = "0-99"
             onChange={handleReps}
             onBlur={handleRepsBlur}
             ref={repsRef}
@@ -409,6 +411,7 @@ export function Settings({
           name="restSelector"
           id="rest-selector"
           type="number"
+          placeholder = "0-999"
           onChange={handleRest}
           onBlur={handleRestBlur}
           value={workout.rest}
