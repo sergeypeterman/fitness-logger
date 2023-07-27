@@ -49,12 +49,13 @@ export function Settings({
               // id
               newWorkout.id = Number(values[0]) + 1; // new id
               console.log("new id: " + newWorkout.id);
-            } else if (ind === 1) {
+            } else if (ind === 1 ) {
               /* date. Skipping old date 
           let oldDate = new Date(values[1]).toLocaleDateString("fr-ca");
           newWorkout.date = oldDate; */
-            } else if (ind === 2) {
+            } else if (ind === 2 && values[2] !== 0) {
               // reps
+              //checking for 0 because it can't be 0
               newWorkout.reps = values[2]; //skipping old reps
             } else if (ind === 3) {
               // rest
@@ -285,6 +286,8 @@ export function Settings({
     }
   };
 
+  console.log(`werehere${workout}`);
+  console.log(workout);
   const setRep = workout.reps.split("x"); //extracting sets and reps to an array
 
   // setting styles for the elements
