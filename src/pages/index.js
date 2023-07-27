@@ -171,7 +171,7 @@ export default function Home() {
       </div>
       <div
         name="widget"
-        className="max-w-lg min-w-sm box-border shadow-xl flex flex-col p-5 m-auto border-slate-400 border-2 rounded-2xl border-solid"
+        className="max-w-lg min-w-[353px] box-border shadow-xl flex flex-col p-5 m-auto border-slate-400 border-2 rounded-2xl border-solid"
       >
         <div name="logo" className="font-header text-5xl m-auto ">
           FITNESS LOGGER

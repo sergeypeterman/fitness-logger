@@ -3,6 +3,37 @@ import { exercise, trainingRecord, TAGSTYLE, BUTTONSTYLE } from "./constants";
 import { checkDate, checkIntegerRange } from "./functions";
 import "./functions";
 
+function PopulateWorkout(wout, headers, values) {
+  const newWorkout = { ...wout };
+  // resetting exercises to avoid duplicating
+  if (headers.length > 0) {
+    newWorkout.exercises.length = 0;
+  }
+  //populating workout with the exercises' data and a new id
+  headers.map((item, ind) => {
+    if (ind === 0) {
+      // id
+      newWorkout.id = Number(values[0]) + 1; // new id
+      console.log("new id: " + newWorkout.id);
+    } else if (ind === 1) {
+      /* date. Skipping old date 
+          let oldDate = new Date(values[1]).toLocaleDateString("fr-ca");
+          newWorkout.date = oldDate; */
+    } else if (ind === 2 && values[2] !== 0) {
+      // reps
+      //checking for 0 because it can't be 0
+      newWorkout.reps = values[2]; //skipping old reps
+    } else if (ind === 3) {
+      // rest
+      newWorkout.rest = values[3]; //skipping old rest
+    } else if (ind > 3) {
+      let ex = new exercise(item, values[ind]);
+      newWorkout.exercises.push(ex);
+    }
+  });
+  return newWorkout;
+}
+
 export function Settings({
   workout,
   updateWorkout,
@@ -38,33 +69,8 @@ export function Settings({
           const { headers, values } = data;
           console.log(headers);
           console.log(values);
-          const newWorkout = { ...workout };
-          // resetting exercises to avoid duplicating
-          if (headers.length > 0) {
-            newWorkout.exercises.length = 0;
-          }
-          //populating workout with the exercises' data and a new id
-          headers.map((item, ind) => {
-            if (ind === 0) {
-              // id
-              newWorkout.id = Number(values[0]) + 1; // new id
-              console.log("new id: " + newWorkout.id);
-            } else if (ind === 1 ) {
-              /* date. Skipping old date 
-          let oldDate = new Date(values[1]).toLocaleDateString("fr-ca");
-          newWorkout.date = oldDate; */
-            } else if (ind === 2 && values[2] !== 0) {
-              // reps
-              //checking for 0 because it can't be 0
-              newWorkout.reps = values[2]; //skipping old reps
-            } else if (ind === 3) {
-              // rest
-              newWorkout.rest = values[3]; //skipping old rest
-            } else {
-              let ex = new exercise(item, values[ind]);
-              newWorkout.exercises.push(ex);
-            }
-          });
+          const newWorkout = PopulateWorkout(workout, headers, values);
+          console.log(newWorkout);
           updateWorkout(newWorkout);
           updateFetched(1);
         })
@@ -248,30 +254,8 @@ export function Settings({
       //handling the response. headers: table headers, values: corresponding values of the last workout
       const results = await response.json();
       const { headers, values } = results;
-      const newWorkout = { ...workout };
-      newWorkout.exercises.length = 0;
-
-      //populating workout with the exercises' data and a new id
-      headers.map((item, ind) => {
-        if (ind === 0) {
-          // id
-          newWorkout.id = Number(values[0]) + 1; // new id
-          console.log("new id: " + newWorkout.id);
-        } else if (ind === 1) {
-          /* date. Skipping old date 
-          let oldDate = new Date(values[1]).toLocaleDateString("fr-ca");
-          newWorkout.date = oldDate; */
-        } else if (ind === 2) {
-          // reps
-          newWorkout.reps = values[2];// skipping old reps
-        } else if (ind === 3) {
-          // rest
-          newWorkout.rest = values[3];// skipping old rest
-        } else {
-          let ex = new exercise(item, values[ind]);
-          newWorkout.exercises.push(ex);
-        }
-      });
+      const newWorkout = PopulateWorkout(workout, headers, values);
+      //newWorkout.exercises.length = 0;
 
       //updating state: workout and 'fetched' flag, loading is done
       updateWorkout(newWorkout);
@@ -286,8 +270,6 @@ export function Settings({
     }
   };
 
-  console.log(`werehere${workout}`);
-  console.log(workout);
   const setRep = workout.reps.split("x"); //extracting sets and reps to an array
 
   // setting styles for the elements
@@ -387,7 +369,7 @@ export function Settings({
             className={`${smButtonStyle} bg-sky-700 hover:bg-sky-900 mr-1`}
             type="number"
             value={setRep[0]}
-            placeholder = "0-99"
+            placeholder="0-99"
             onChange={handleSets}
             onBlur={handleSetsBlur}
             ref={setsRef}
@@ -398,7 +380,7 @@ export function Settings({
             className={`${smButtonStyle} bg-sky-700 hover:bg-sky-900 ml-1`}
             type="number"
             value={setRep[1]}
-            placeholder = "0-99"
+            placeholder="0-99"
             onChange={handleReps}
             onBlur={handleRepsBlur}
             ref={repsRef}
@@ -414,7 +396,7 @@ export function Settings({
           name="restSelector"
           id="rest-selector"
           type="number"
-          placeholder = "0-999"
+          placeholder="0-999"
           onChange={handleRest}
           onBlur={handleRestBlur}
           value={workout.rest}
