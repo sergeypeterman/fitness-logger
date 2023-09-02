@@ -1,15 +1,19 @@
-import { Html, Head, Main, NextScript } from 'next/document'
+import { Html, Head, Main, NextScript } from "next/document";
 
 export default function Document() {
   return (
     <Html lang="en">
-      <title>Fitness Logger app</title>
-      <meta name='description' content='Fitness Logger helps to track workouts'/>
-      <Head />
+      <Head>
+        <title>Fitness Logger app</title>
+        <meta
+          name="description"
+          content="Fitness Logger helps to track workouts"
+        />
+      </Head>
       <body>
         <Main />
         <NextScript />
       </body>
     </Html>
-  )
+  );
 }
