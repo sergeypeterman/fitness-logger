@@ -7,7 +7,7 @@ export default function Document() {
         <title>Fitness Logger app</title>
         <meta
           name="description"
-          content="Fitness Logger helps to track workouts"
+          content="Fitness Logger app helps to track workouts"
         />
       </Head>
       <body>
