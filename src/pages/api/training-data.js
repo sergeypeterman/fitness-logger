@@ -1,19 +1,30 @@
 const { GoogleSpreadsheet } = require("google-spreadsheet");
-const sheetId = process.env.GOOGLE_SHEET_ID;
-const doc = new GoogleSpreadsheet(sheetId);
+
 import {
   validateValues,
   checkIntegerRange,
   checkDate,
 } from "@/components/functions";
+import { JWT } from "google-auth-library";
+
+const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
+const sheetId = process.env.GOOGLE_SHEET_ID;
+
+const jwtFromEnv = new JWT({
+  email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+  key: process.env.GOOGLE_PRIVATE_KEY,
+  scopes: SCOPES,
+});
+
+const doc = new GoogleSpreadsheet(sheetId, jwtFromEnv);
 
 export default async function handler(req, res) {
   try {
-    await doc.useServiceAccountAuth({
+    /* await doc.useServiceAccountAuth({
       client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
       private_key: process.env.GOOGLE_PRIVATE_KEY,
     });
-
+ */
     await doc.loadInfo(); // loads document properties and worksheets
     let sheets = [];
     let sheetTitles = [];
