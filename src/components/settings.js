@@ -254,6 +254,7 @@ export function Settings({
       //handling the response. headers: table headers, values: corresponding values of the last workout
       const results = await response.json();
       const { headers, values } = results;
+      console.log(headers, values);
       const newWorkout = PopulateWorkout(workout, headers, values);
       //newWorkout.exercises.length = 0;
 

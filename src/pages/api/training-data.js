@@ -90,9 +90,6 @@ export default async function handler(req, res) {
 
         const programIndex = sheetTitles.indexOf(selected);
 
-        /*console.log(sheetTitles);
-        console.log(`${selected} ' index = ${programIndex}`);*/
-
         sheet = doc.sheetsByIndex[programIndex];
 
         await sheet.loadCells();
