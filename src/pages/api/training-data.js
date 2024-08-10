@@ -1,6 +1,9 @@
 const { GoogleSpreadsheet } = require("google-spreadsheet");
 
-import { readValuesAndUpdateDoc, readSelectedProgram } from "@/components/functions";
+import {
+  readValuesAndUpdateDoc,
+  readSelectedProgram,
+} from "@/components/functions";
 import { JWT } from "google-auth-library";
 
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
@@ -47,7 +50,7 @@ export default async function handler(req, res) {
       const isInitial = Buffer.from("initial").toString("base64");
 
       if (selected == isInitial) {
-        //if it's an initial request (fetched = 0)
+        //if it's an initial request (react state "fetched" = 0)
         const sheets = doc.sheetsByIndex;
         const sheetTitles = sheets.map((item) => item.title);
 
@@ -78,5 +81,3 @@ export default async function handler(req, res) {
       : res.status(500).json(err);
   }
 }
-
-

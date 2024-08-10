@@ -1,10 +1,6 @@
 const { GoogleSpreadsheet } = require("google-spreadsheet");
 
-import {
-  validateValues,
-  checkIntegerRange,
-  checkDate,
-} from "@/components/functions";
+import { copyAllTrainingDataFromDocToDB } from "@/components/functions";
 import { JWT } from "google-auth-library";
 
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
@@ -28,73 +24,80 @@ export default async function useMysqlDB(req, res) {
   });
 
   try {
-    const doc = new GoogleSpreadsheet(sheetId, jwtFromEnv);
-
-    await copyAllTrainingDataFromDocToDB(doc, db);
+    //import everything from sheets to db, no validation yet
+    //const doc = new GoogleSpreadsheet(sheetId, jwtFromEnv);
+    //await copyAllTrainingDataFromDocToDB(doc, db);
   } catch (err) {
     console.log(err);
   } finally {
     db.end();
   }
 
-  const {
-    query: { workout },
-  } = req;
-
-  if (workout) {
-    //console.log(`api: ${JSON.parse(workout).id}`);
-    res.status(200).json({ message: "testStr", status: "done" });
-  } else {
-    res.status(500).json({ message: "some error" });
-  }
-}
-/***************functions**********************/
-async function copyAllTrainingDataFromDocToDB(doc, db) {
   try {
-    await doc.loadInfo(); // loads document properties and worksheets
+    // ***** POST *****
+    // ****************
+    if (req.method == "POST") {
+      const {
+        query: { selected },
+      } = req;
 
-    const sheets = doc.sheetsByIndex;
-    const sheetTitles = sheets.map((item) => item.title);
+      readValuesAndUpdateDoc();
 
-    const docData = [];
-    for (const theSheet of sheets) {
-      await theSheet.loadCells();
-      const rows = await theSheet.getRows();
-      console.log(
-        `api: there are ${rows.length} rows in the ${theSheet.title}`
-      );
-      const sheetData = rows.map((theRow) => {
-        const row = {};
-        for (const header of theSheet.headerValues) {
-          const value = theRow.get(header);
-          const valueNaN = Number.isNaN(+value) ? value : +value;
-          row[header] = valueNaN;
-        }
-        // console.log(JSON.stringify(row));
-        // console.log(`Squat: ${typeof row.Squat}, ${row.Squat}`);
-        return row;
-      });
-      const sheetObj = { program: theSheet.title, data: sheetData };
-      docData.push(sheetObj);
-    }
-
-    for (const programSheet of docData) {
-      //getting data ready for workouts table
-      //getting program id from programs table
-      const programID = await getProgramIDfromDB(db, programSheet);
-
-      for (const theWorkout of programSheet.data) {
-        //getting exercises list from exercises table
-        const programData = await getProgramDataFromDB(db, theWorkout);
-        //insert workout into the table
-        await insertWorkoutToDB(programID, programData, theWorkout, db);
+      if (updateAttempt.success) {
+        res.status(200).json({ message: updateAttempt.message });
+      } else {
+        res.status(400).end(`${updateAttempt.message}`);
       }
     }
-    return { status: "Import: success" };
+    // ***** GET *****
+    // ****************
+    else if (req.method == "GET") {
+      const {
+        query: { selected },
+      } = req;
+
+      //reading encoded word 'initial'
+      const isInitial = Buffer.from("initial").toString("base64");
+
+      if (selected == isInitial) {
+        //if it's an initial request (react state "fetched" = 0)
+        //reading existing programs and returning their names in array 'titles'
+        //after that in Settings component we're selecting the first one [0] <-- this should be rewrited
+
+        res.status(200).json({ titles: sheetTitles });
+      } else if (selected) {
+        //if it's an actual data request
+        //for the program with <selected> program name we're getting:
+        // • headers (e.g.): [id,	Date,	Reps,	Rest (sec), Squat,	Static lunge,	Barbell row, Barbell press,	Running]
+        // • values (e.g.): [27,	8/6/2024,	2x5,	120,	120,	60,	65,	90,	5]
+        // and returning them
+        const readAttempt = await readSelectedProgram(doc, selected);
+        if (readAttempt.success) {
+          res.status(200).json({
+            headers: readAttempt.data.headers,
+            values: readAttempt.data.values,
+          });
+        } else {
+          //if there are only initial headers, return error
+          res.status(500).end("Not enough data in the sheet");
+        }
+      } else {
+        res.status(400).end(`Unknown Program selected`);
+      }
+    } else {
+      //in case it's not either GET or POST
+      res.status(400).end(`${req.method} Not Allowed`);
+    }
   } catch (err) {
-    throw new Error(err);
+    console.log("error api " + err + err.code);
+    console.log(err);
+    console.log(typeof err);
+    err.errno === "ENOTFOUND"
+      ? res.status(503).json("Looks like you're offline")
+      : res.status(500).json(err);
   }
 }
+/*************************************/
 
 const testP = {
   program: "Break-In Squat",
@@ -162,41 +165,3 @@ const exercises = [
   "Seated row",
   "Pullups",
 ]; */
-
-async function getProgramIDfromDB(db, dataObject) {
-  const getProgramIDQuery = `SELECT id FROM programs WHERE name = '${dataObject.program}'`;
-  let result = await db.query(getProgramIDQuery);
-  const programID = result[0][0].id;
-  console.log(`program id: ${programID}`);
-  return programID;
-}
-
-async function getProgramDataFromDB(db, dataObject) {
-  const programData = [];
-
-  const exercisesNum = Object.keys(dataObject).length;
-
-  for (let i = 4; i < exercisesNum; i++) {
-    const exerciseName = Object.keys(dataObject)[i];
-    //console.log(`'${exerciseName}'`);
-    const getExerciseIDQuery = `SELECT id FROM exercises WHERE name = '${exerciseName}'`;
-    let result = await db.query(getExerciseIDQuery);
-    const exerciseID = result[0][0].id;
-    //console.log(`${Object.keys(dataObject)[i]} id: ${exerciseID}`);
-    const exerciseData = {
-      exercise_id: exerciseID,
-      workload: dataObject[exerciseName],
-    };
-    programData.push(exerciseData);
-  }
-  //console.log(programData);
-  return programData;
-}
-
-async function insertWorkoutToDB(programID, programData, dataObject, db) {
-  const dbQuery = `INSERT INTO workouts(program, program_data, date) VALUES (${programID},'${JSON.stringify(
-    programData
-  )}', STR_TO_DATE('${dataObject["Date"]}',"%m/%d/%Y"))`;
-  //console.log(dbQuery);
-  await db.query(dbQuery);
-}
