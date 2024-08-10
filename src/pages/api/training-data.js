@@ -1,10 +1,6 @@
 const { GoogleSpreadsheet } = require("google-spreadsheet");
 
-import {
-  validateValues,
-  checkIntegerRange,
-  checkDate,
-} from "@/components/functions";
+import { readValuesAndUpdateDoc, readSelectedProgram } from "@/components/functions";
 import { JWT } from "google-auth-library";
 
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
@@ -16,60 +12,33 @@ const jwtFromEnv = new JWT({
   scopes: SCOPES,
 });
 
-const doc = new GoogleSpreadsheet(sheetId, jwtFromEnv);
-
 export default async function handler(req, res) {
   try {
-    /* await doc.useServiceAccountAuth({
-      client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-      private_key: process.env.GOOGLE_PRIVATE_KEY,
-    });
- */
+    const doc = new GoogleSpreadsheet(sheetId, jwtFromEnv);
     await doc.loadInfo(); // loads document properties and worksheets
-    let sheets = [];
-    let sheetTitles = [];
-    let sheet;
-    let values = [];
-    let rows; //getting rows
 
-    //if fetching with post == true , validate the data and update the sheet
+    // ***** POST *****
+    // ****************
     if (req.method == "POST") {
       const {
         query: { selected },
       } = req;
 
-      sheets = doc.sheetsByIndex;
-      sheetTitles = sheets.map((item) => item.title);
+      const updateAttempt = await readValuesAndUpdateDoc(
+        doc,
+        selected,
+        req.body
+      );
 
-      const programIndex = sheetTitles.indexOf(selected);
-
-      /*console.log(sheetTitles);
-      console.log(`${selected} ' index = ${programIndex}`);*/
-
-      sheet = doc.sheetsByIndex[programIndex];
-      await sheet.loadCells();
-
-      values = [...req.body]; //reading new values and writing them to the new row
-      let valStatus = validateValues(values);
-
-      console.log("API valStatus: ");
-      console.log(valStatus);
-
-      if (valStatus.value) {
-        const dimensions = { startIndex: 1, endIndex: 2 }; //selecting the first row for inserting
-        await sheet.insertDimension("ROWS", dimensions, true); //insert a row in the beginning and getting new rows
-        rows = await sheet.getRows();
-
-        const options = { raw: false, insert: false, index: 0 };
-        await sheet.addRow(valStatus.newValues, options);
-
-        //updating data and sheet
-        await sheet.saveUpdatedCells();
-        res.status(200).json({ message: "Added" });
+      if (updateAttempt.success) {
+        res.status(200).json({ message: updateAttempt.message });
       } else {
-        res.status(400).end(`${valStatus.message}`);
+        res.status(400).end(`${updateAttempt.message}`);
       }
-    } else if (req.method == "GET") {
+    }
+    // ***** GET *****
+    // ****************
+    else if (req.method == "GET") {
       const {
         query: { selected },
       } = req;
@@ -79,34 +48,21 @@ export default async function handler(req, res) {
 
       if (selected == isInitial) {
         //if it's an initial request (fetched = 0)
-        sheets = doc.sheetsByIndex;
-        sheetTitles = sheets.map((item) => item.title);
+        const sheets = doc.sheetsByIndex;
+        const sheetTitles = sheets.map((item) => item.title);
 
         res.status(200).json({ titles: sheetTitles });
       } else if (selected) {
         //if it's an actual data request
-        sheets = doc.sheetsByIndex;
-        sheetTitles = sheets.map((item) => item.title);
-
-        const programIndex = sheetTitles.indexOf(selected);
-
-        sheet = doc.sheetsByIndex[programIndex];
-
-        await sheet.loadCells();
-        rows = await sheet.getRows();
-        //is it a first workout in the sheet? if yes, fill values with 0-s
-        if (rows.length) {
-          values = [...rows[0]._rawData]; //getting values
+        const readAttempt = await readSelectedProgram(doc, selected);
+        if (readAttempt.success) {
+          res.status(200).json({
+            headers: readAttempt.data.headers,
+            values: readAttempt.data.values,
+          });
         } else {
-          sheet.headerValues.map((item, ind) => (values[ind] = 0));
+          res.status(500).end("Not enough data in the sheet");
         }
-        //sending headers and corresponding values, if there are >4 headers
-        // if <= 4 headers, error, there are no exercises
-        let hValues = [...sheet.headerValues];
-
-        hValues.length > 4
-          ? res.status(200).json({ headers: hValues, values: values })
-          : res.status(500).end("Not enough data in the sheet");
       } else {
         res.status(400).end(`Unknown Program selected`);
       }
@@ -122,3 +78,5 @@ export default async function handler(req, res) {
       : res.status(500).json(err);
   }
 }
+
+

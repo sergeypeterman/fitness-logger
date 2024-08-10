@@ -157,4 +157,67 @@ Date.prototype.addDate = function (years, months, days) {
   return date;
 };
 
+//taking doc <GoogleSpreadsheet> and selected program index to read the program from the spreadsheet
+export async function readSelectedProgram(doc, selected) {
+  const sheets = doc.sheetsByIndex;
+  const sheetTitles = sheets.map((item) => item.title);
 
+  const programIndex = sheetTitles.indexOf(selected);
+
+  const sheet = doc.sheetsByIndex[programIndex];
+
+  await sheet.loadCells();
+  const rows = await sheet.getRows();
+  //is it a first workout in the sheet? if yes, fill values with 0-s
+  let values = [];
+  if (rows.length) {
+    values = [...rows[0]._rawData]; //getting values
+  } else {
+    sheet.headerValues.map((item, ind) => (values[ind] = 0));
+  }
+  //sending headers and corresponding values, if there are >4 headers
+  // if <= 4 headers, error, there are no exercises
+  const hValues = [...sheet.headerValues];
+  const result =
+    hValues.length > 4
+      ? {
+          success: true,
+          message: "Read",
+          data: { headers: hValues, values: values },
+        }
+      : { success: false, message: "Not enough data in the sheet", data: null };
+  return result;
+}
+
+//taking doc <GoogleSpreadsheet>, selected program index and req.body (with values) to add workout to the spreadsheet
+export async function readValuesAndUpdateDoc(doc, selected, body) {
+  const sheets = doc.sheetsByIndex;
+  const sheetTitles = sheets.map((item) => item.title);
+
+  const programIndex = sheetTitles.indexOf(selected);
+
+  const sheet = doc.sheetsByIndex[programIndex];
+  await sheet.loadCells();
+
+  const values = [...body]; //reading new values and writing them to the new row
+  let valStatus = validateValues(values);
+
+  console.log("API valStatus: ");
+  console.log(valStatus);
+
+  if (valStatus.value) {
+    const dimensions = { startIndex: 1, endIndex: 2 }; //selecting the first row for inserting
+    await sheet.insertDimension("ROWS", dimensions, true); //insert a row in the beginning and getting new rows
+    const rows = await sheet.getRows();
+
+    const options = { raw: false, insert: false, index: 0 };
+    await sheet.addRow(valStatus.newValues, options);
+
+    //updating data and sheet
+    await sheet.saveUpdatedCells();
+
+    return { success: true, message: "Added" };
+  } else {
+    return { success: false, message: valStatus.message };
+  }
+}

@@ -16,9 +16,6 @@ const jwtFromEnv = new JWT({
   scopes: SCOPES,
 });
 
-const doc = new GoogleSpreadsheet(sheetId, jwtFromEnv);
-/************************************************/
-
 const mysql = require("mysql2/promise");
 
 export default async function useMysqlDB(req, res) {
@@ -31,24 +28,38 @@ export default async function useMysqlDB(req, res) {
   });
 
   try {
+    const doc = new GoogleSpreadsheet(sheetId, jwtFromEnv);
+
+    await copyAllTrainingDataFromDocToDB(doc, db);
+  } catch (err) {
+    console.log(err);
+  } finally {
+    db.end();
+  }
+
+  const {
+    query: { workout },
+  } = req;
+
+  if (workout) {
+    //console.log(`api: ${JSON.parse(workout).id}`);
+    res.status(200).json({ message: "testStr", status: "done" });
+  } else {
+    res.status(500).json({ message: "some error" });
+  }
+}
+/***************functions**********************/
+async function copyAllTrainingDataFromDocToDB(doc, db) {
+  try {
     await doc.loadInfo(); // loads document properties and worksheets
-    let sheets = [];
-    let sheetTitles = [];
-    let sheet;
-    let values = [];
-    let rows; //getting rows
 
-    sheets = doc.sheetsByIndex;
-    sheetTitles = sheets.map((item) => item.title);
-    //console.log(sheetTitles);
+    const sheets = doc.sheetsByIndex;
+    const sheetTitles = sheets.map((item) => item.title);
 
-    //sheet = doc.sheetsByIndex[0];
-
-    //await sheet.loadCells();
     const docData = [];
     for (const theSheet of sheets) {
       await theSheet.loadCells();
-      rows = await theSheet.getRows();
+      const rows = await theSheet.getRows();
       console.log(
         `api: there are ${rows.length} rows in the ${theSheet.title}`
       );
@@ -79,27 +90,9 @@ export default async function useMysqlDB(req, res) {
         await insertWorkoutToDB(programID, programData, theWorkout, db);
       }
     }
-
-    /*     const programID = await getProgramIDfromDB(db, testP);
-    //getting exercises list from exercises table
-    const programData = await getProgramDataFromDB(db, testP.data[0]);
-    //insert workout into the table
-    await insertWorkoutToDB(programID, programData, testP.data[0], db); */
+    return { status: "Import: success" };
   } catch (err) {
-    console.log(err);
-  } finally {
-    db.end();
-  }
-
-  const {
-    query: { workout },
-  } = req;
-
-  if (workout) {
-    //console.log(`api: ${JSON.parse(workout).id}`);
-    res.status(200).json({ message: "testStr", status: "done" });
-  } else {
-    res.status(500).json({ message: "some error" });
+    throw new Error(err);
   }
 }
 
