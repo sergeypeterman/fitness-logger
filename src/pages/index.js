@@ -33,7 +33,7 @@ export default function Home() {
 
       const initial = Buffer.from("initial").toString("base64");
       setLoading(true);
-      fetch(`/api/training-data?selected=${initial}`, {
+      fetch(`/api/workouts-db?selected=${initial}`, {
         method: "GET",
       })
         .then((response) => response.json())

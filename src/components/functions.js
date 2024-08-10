@@ -222,11 +222,11 @@ export async function readValuesAndUpdateDoc(doc, selected, body) {
   }
 }
 
-export async function getProgramIDfromDB(db, dataObject) {
-  const getProgramIDQuery = `SELECT id FROM programs WHERE name = '${dataObject.program}'`;
-  let result = await db.query(getProgramIDQuery);
-  const programID = result[0][0].id;
-  console.log(`program id: ${programID}`);
+export async function getProgramSettingsfromDB(db, dataObject) {
+  const getProgramIDQuery = `SELECT * FROM programs WHERE name = '${dataObject.program}'`;
+  const result = await db.query(getProgramIDQuery);
+  const programID = result[0][0];
+  console.log(`program id: ${programID.id}`);
   return programID;
 }
 
@@ -292,13 +292,13 @@ export async function copyAllTrainingDataFromDocToDB(doc, db) {
     for (const programSheet of docData) {
       //getting data ready for workouts table
       //getting program id from programs table
-      const programID = await getProgramIDfromDB(db, programSheet);
+      const programID = await getProgramSettingsfromDB(db, programSheet);
 
       for (const theWorkout of programSheet.data) {
         //getting exercises list from exercises table
         const programData = await getProgramDataFromDB(db, theWorkout);
         //insert workout into the table
-        await insertWorkoutToDB(programID, programData, theWorkout, db);
+        await insertWorkoutToDB(programID.id, programData, theWorkout, db);
       }
     }
     return { status: "Import: success" };

@@ -61,7 +61,7 @@ export function Settings({
     if (isFetched === 0 || isFetched === 2) {
       updateLoading(true); //loading...
       console.log(`sent from settings: ${selectedProgram}`);
-      fetch(`/api/training-data?selected=${selectedProgram}`, {
+      fetch(`/api/workouts-db?selected=${selectedProgram}`, {
         method: "GET",
       })
         .then((response) => response.json())
