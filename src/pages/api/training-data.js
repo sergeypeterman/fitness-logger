@@ -27,6 +27,7 @@ export default async function handler(req, res) {
         query: { selected },
       } = req;
 
+      //won't work now, because exercises now contain .workload and .name, not just .workload integers
       const updateAttempt = await readValuesAndUpdateDoc(
         doc,
         selected,

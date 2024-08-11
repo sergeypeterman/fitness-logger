@@ -113,14 +113,14 @@ export default function Home() {
         item = workout.rest;
       } else {
         //exercises
-        item = workout.exercises[ind - 4].workload;
+        item = workout.exercises[ind - 4];
       }
       newValues.push(item);
     }
 
     try {
       const response = await fetch(
-        `/api/training-data?selected=${selectedProgram}`,
+        `/api/workouts-db?selected=${selectedProgram}`,
         {
           method: "POST",
           headers: {
@@ -162,7 +162,7 @@ export default function Home() {
         <p
           className={
             !error && fetched === 2
-              ? "transition duration-1000 ease-in-out m-auto py-3 w-1/2 flex fixed top-10 left-1/2 -translate-y-1/2 -translate-x-1/2 z-10 justify-center items-center bg-green-600 text-white rounded-md"
+              ? "transition duration-3000 ease-in-out m-auto py-3 w-1/2 flex fixed top-10 left-1/2 -translate-y-1/2 -translate-x-1/2 z-10 justify-center items-center bg-green-600 text-white rounded-md"
               : "transition duration-100 ease-in-out opacity-0 m-auto py-3 w-1/2 flex fixed top-10 left-1/2 -translate-y-1/2 -translate-x-1/2 z-10 justify-center items-center bg-green-600 text-white rounded-md"
           }
         >

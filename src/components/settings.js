@@ -241,7 +241,7 @@ export function Settings({
 
       updateLoading(true); //loading...
       const response = await fetch(
-        `/api/training-data?selected=${newProgram}`,
+        `/api/workouts-db?selected=${newProgram}`,
         {
           method: "GET",
         }

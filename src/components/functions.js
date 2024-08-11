@@ -75,7 +75,7 @@ export function validateValues(values) {
   let newValues = [...values];
   let errorIndices = [];
 
-  console.log(values);
+  //console.log(values);
   if (values.length > 4) {
     let result = values.reduce((res, item, ind) => {
       let inRange;
@@ -83,7 +83,7 @@ export function validateValues(values) {
       if (item === "") {
         return false;
       }
-      console.log(`Reduce, ind = ${ind} item = ${item} result = ${res}`);
+      //console.log(`Reduce, ind = ${ind} item = ${item} result = ${res}`);
 
       if (ind === 0) {
         //id
@@ -113,16 +113,23 @@ export function validateValues(values) {
           errorIndices.push(false);
           return false;
         }
-      } else {
-        //exercises and rest
+      } else if (ind === 3) {
+        //rest
         newValues[ind] = Number(item);
         inRange = checkIntegerRange(newValues[ind], 0, 999);
 
         errorIndices.push(inRange.intInRange);
         return res && inRange.intInRange;
+      } else {
+        //exercises
+        newValues[ind] = {workload: Number(item.workload), name: item.name};
+        inRange = checkIntegerRange(newValues[ind].workload, 0, 999);
+
+        errorIndices.push(inRange.intInRange);
+        return res && inRange.intInRange;
       }
     }, true);
-    console.log(newValues);
+    //console.log(newValues);
     message = result ? "API: correct data" : "API: wrong data input";
     return {
       value: result,
@@ -222,6 +229,39 @@ export async function readValuesAndUpdateDoc(doc, selected, body) {
   }
 }
 
+//taking mysql db, selected program index and req.body (with values) to add workout to the DB
+export async function readValuesAndUpdateDB(db, selected, body) {
+  const sheets = doc.sheetsByIndex;
+  const sheetTitles = sheets.map((item) => item.title);
+
+  const programIndex = sheetTitles.indexOf(selected);
+
+  const sheet = doc.sheetsByIndex[programIndex];
+  await sheet.loadCells();
+
+  const values = [...body]; //reading new values and writing them to the new row
+  let valStatus = validateValues(values);
+
+  console.log("API valStatus: ");
+  console.log(valStatus);
+
+  if (valStatus.value) {
+    const dimensions = { startIndex: 1, endIndex: 2 }; //selecting the first row for inserting
+    await sheet.insertDimension("ROWS", dimensions, true); //insert a row in the beginning and getting new rows
+    const rows = await sheet.getRows();
+
+    const options = { raw: false, insert: false, index: 0 };
+    await sheet.addRow(valStatus.newValues, options);
+
+    //updating data and sheet
+    await sheet.saveUpdatedCells();
+
+    return { success: true, message: "Added" };
+  } else {
+    return { success: false, message: valStatus.message };
+  }
+}
+
 export async function getProgramSettingsfromDB(db, dataObject) {
   const getProgramIDQuery = `SELECT * FROM programs WHERE name = '${dataObject.program}'`;
   const result = await db.query(getProgramIDQuery);
@@ -234,10 +274,11 @@ export async function getProgramDataFromDB(db, dataObject) {
   const programData = [];
 
   const exercisesNum = Object.keys(dataObject).length;
+  console.log(`--dataobject`, dataObject);
 
   for (let i = 4; i < exercisesNum; i++) {
     const exerciseName = Object.keys(dataObject)[i];
-    //console.log(`'${exerciseName}'`);
+    console.log(`--`, exerciseName);
     const getExerciseIDQuery = `SELECT id FROM exercises WHERE name = '${exerciseName}'`;
     let result = await db.query(getExerciseIDQuery);
     const exerciseID = result[0][0].id;
@@ -252,7 +293,12 @@ export async function getProgramDataFromDB(db, dataObject) {
   return programData;
 }
 
-export async function insertWorkoutToDB(programID, programData, dataObject, db) {
+export async function insertWorkoutToDB(
+  programID,
+  programData,
+  dataObject,
+  db
+) {
   const dbQuery = `INSERT INTO workouts(program, program_data, date) VALUES (${programID},'${JSON.stringify(
     programData
   )}', STR_TO_DATE('${dataObject["Date"]}',"%m/%d/%Y"))`;
