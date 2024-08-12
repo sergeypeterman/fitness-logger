@@ -13,8 +13,9 @@ import {
 } from "@testing-library/react";
 import { exercise } from "@/components/constants";
 import "@testing-library/jest-dom";
+import '@testing-library/jest-dom/extend-expect';
 
-const sheetTitles = ["Break-In Squat", "Break-In Deadlift"];
+const programs = ["Break-In Squat", "Break-In Deadlift"];
 const values = ["39", "4/26/2023", "2x15", "120", "223", "77", "50", "10", "0"];
 const headers = [
   "id",
@@ -37,7 +38,7 @@ global.fetch = jest.fn((url) => {
     return Promise.resolve({
       json: () =>
         Promise.resolve({
-          titles: sheetTitles,
+          titles: programs,
         }),
     });
   } else {

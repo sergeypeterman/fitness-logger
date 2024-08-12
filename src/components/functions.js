@@ -68,7 +68,7 @@ export function validateValues(values) {
   /* return { 
     value: result (bool),
     message: message(string),
-    newValues: newValues([], new normalized array), 
+    newValues: newValues([], new normalized array with names for exercises), 
     errorIndices:errorIndices ([bool], validation result on every 'values' element)} */
 
   let message = "";
