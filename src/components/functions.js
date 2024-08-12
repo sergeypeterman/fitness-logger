@@ -122,7 +122,7 @@ export function validateValues(values) {
         return res && inRange.intInRange;
       } else {
         //exercises
-        newValues[ind] = {workload: Number(item.workload), name: item.name};
+        newValues[ind] = { workload: Number(item.workload), name: item.name };
         inRange = checkIntegerRange(newValues[ind].workload, 0, 999);
 
         errorIndices.push(inRange.intInRange);
@@ -282,14 +282,12 @@ export async function getProgramDataFromDB(db, dataObject) {
     const getExerciseIDQuery = `SELECT id FROM exercises WHERE name = '${exerciseName}'`;
     let result = await db.query(getExerciseIDQuery);
     const exerciseID = result[0][0].id;
-    //console.log(`${Object.keys(dataObject)[i]} id: ${exerciseID}`);
     const exerciseData = {
       exercise_id: exerciseID,
       workload: dataObject[exerciseName],
     };
     programData.push(exerciseData);
   }
-  //console.log(programData);
   return programData;
 }
 
@@ -302,7 +300,6 @@ export async function insertWorkoutToDB(
   const dbQuery = `INSERT INTO workouts(program, program_data, date) VALUES (${programID},'${JSON.stringify(
     programData
   )}', STR_TO_DATE('${dataObject["Date"]}',"%m/%d/%Y"))`;
-  //console.log(dbQuery);
   await db.query(dbQuery);
 }
 
@@ -327,8 +324,6 @@ export async function copyAllTrainingDataFromDocToDB(doc, db) {
           const valueNaN = Number.isNaN(+value) ? value : +value;
           row[header] = valueNaN;
         }
-        // console.log(JSON.stringify(row));
-        // console.log(`Squat: ${typeof row.Squat}, ${row.Squat}`);
         return row;
       });
       const sheetObj = { program: theSheet.title, data: sheetData };
@@ -353,31 +348,122 @@ export async function copyAllTrainingDataFromDocToDB(doc, db) {
   }
 }
 
-//dataObject reference
-const testP = {
-  program: "Break-In Squat",
-  data: [
-    {
-      id: 16,
-      Date: "3/6/2024",
-      Reps: "3x8",
-      "Rest (sec)": 60,
-      Squat: 90,
-      "Static lunge": 50,
-      "Dumbbell row": 60,
-      "Barbell press": 70,
-      Running: 6,
+export async function createNewWorkoutForDB(db, selected, validatedValues) {
+  const selectedProgramDefaults = await getProgramSettingsfromDB(db, {
+    program: selected,
+  });
+  //console.log(`selectedProgramDefaults: `, selectedProgramDefaults);
+  const newWorkoutForDB = {
+    program: selectedProgramDefaults.id,
+    comment: null,
+    date: validatedValues[1],
+    programSettings: {
+      rest: validatedValues[3],
+      sets: +validatedValues[2].split("x")[0],
+      reps: +validatedValues[2].split("x")[1],
     },
-    {
-      id: 15,
-      Date: "3/1/2024",
-      Reps: "3x8",
-      "Rest (sec)": 60,
-      Squat: 90,
-      "Static lunge": 40,
-      "Dumbbell row": 65,
-      "Barbell press": 65,
-      Running: 6,
-    },
-  ],
-};
+  };
+
+  let receivedExercisesNames = [];
+  for (let i = 4; i < validatedValues.length; i++) {
+    receivedExercisesNames.push(`'${validatedValues[i].name}'`);
+  }
+  const exerciseQuery = `SELECT id, name FROM exercises WHERE name IN (${receivedExercisesNames.join(
+    ", "
+  )})`;
+  const result = await db.query(exerciseQuery);
+  const exerciseNames = result[0].reduce((acc, item) => {
+    acc[item.name] = item.id;
+    return acc;
+  }, {});
+
+  const programData = [];
+  for (let i = 4; i < validatedValues.length; i++) {
+    const exercise = {};
+    exercise.workload = validatedValues[i].workload;
+    exercise.exercise_id = exerciseNames[validatedValues[i].name];
+    programData.push(exercise);
+  }
+  newWorkoutForDB.programData = programData;
+  return newWorkoutForDB;
+}
+
+export async function insertNewWorkoutToDB(db, newWorkoutForDB) {
+  try {
+    let insertNewWorkoutQuery = `INSERT INTO workouts(program, program_data, comment, date, program_settings) VALUES (`;
+    insertNewWorkoutQuery += `${newWorkoutForDB.program}, `;
+    insertNewWorkoutQuery += `'${JSON.stringify(
+      newWorkoutForDB.programData
+    )}', `;
+    insertNewWorkoutQuery += `${newWorkoutForDB.comment}, `;
+    insertNewWorkoutQuery += `STR_TO_DATE('${newWorkoutForDB.date}',"%Y-%m-%d"), `;
+    insertNewWorkoutQuery += `'${JSON.stringify(
+      newWorkoutForDB.programSettings
+    )}')`;
+    //console.log(insertNewWorkoutQuery);
+    const resq = await db.query(insertNewWorkoutQuery);
+    return {
+      success: true,
+      message: "New workout successfully added to the DB",
+      error: null,
+      result: resq,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: "Query error (inserting new workout to the DB)",
+      error: err,
+      result: resq,
+    };
+  }
+}
+
+export async function getNewestSelectedWorkoutFromDB(db, selected) {
+  //for the program with <selected> program name we're getting:
+  // • headers (e.g.):  [id, Date,      Reps, Rest (sec), Squat,  Static lunge, Barbell row,  Barbell press,  Running]
+  // • values (e.g.):   [27, 8/6/2024,  2x5,  120,        120,    60,	          65,           90,             5]
+  // and returning them
+  const readAttempt = { success: false };
+
+  try {
+    //getting default program settings (sets, reps, rest)
+    const programSettings = await getProgramSettingsfromDB(db, {
+      program: selected,
+    });
+    //getting exercises list from the last actual workout with this program
+    const getProgramIDQuery = `SELECT * FROM workouts WHERE program = ${programSettings.id} ORDER BY date DESC LIMIT 1`;
+    const result = await db.query(getProgramIDQuery);
+    const newestWorkout = result[0][0];
+
+    //filling data in
+    const data = {};
+    data.headers = ["id", "Date", "Reps", "Rest (sec)"];
+
+    const workoutDate = new Date(newestWorkout.date).toLocaleDateString(
+      "fr-ca"
+    );
+    data.values = [
+      newestWorkout.id,
+      workoutDate,
+      `${programSettings.sets}x${programSettings.reps}`,
+      programSettings.rest,
+    ];
+
+    //transforming id-s to names
+    for (const exercise of newestWorkout.program_data) {
+      const getProgramIDQuery = `SELECT name FROM exercises WHERE id = ${exercise.exercise_id}`;
+      const result = await db.query(getProgramIDQuery);
+      const exercise_name = result[0][0].name;
+      data.headers.push(exercise_name);
+      data.values.push(+exercise.workload);
+    }
+    readAttempt.success = true;
+    readAttempt.data = data;
+  } catch (error) {
+    readAttempt.success = false;
+    readAttempt.data = data;
+    console.log("API: Reading error:", readAttempt.data);
+  } finally {
+    return readAttempt;
+  }
+}
