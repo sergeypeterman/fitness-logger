@@ -12,8 +12,6 @@ import {
 
 //////////////////////***************************************/
 const today = new Date().toLocaleDateString("fr-ca");
-//const initialWorkout = new trainingRecord(-1, today, "2x15", 120, []);
-
 //////////////////////***************************************/
 
 export async function getServerSideProps() {

@@ -1,9 +1,13 @@
 import "@/styles/globals.css";
+import Head from "next/head";
 
 export default function App({ Component, pageProps }) {
   return (
     <>
-      <title>Fitness Logger app</title>
+      <Head>
+        <title>Fitness Logger app</title>
+      </Head>
+
       <Component {...pageProps} />
     </>
   );
