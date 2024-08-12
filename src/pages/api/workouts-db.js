@@ -1,6 +1,7 @@
 import {
   createNewWorkoutForDB,
   getNewestSelectedWorkoutFromDB,
+  getProgramsListFromDB,
   insertNewWorkoutToDB,
   validateValues,
 } from "@/components/functions";
@@ -67,10 +68,7 @@ export default async function useMysqlDB(req, res) {
         //reading existing programs and returning their names in array 'titles'
         //after that in Settings component we're selecting the first one [0] <-- this should be rewrited
 
-        const getProgramsListQuery = `SELECT name FROM programs`;
-        const result = await db.query(getProgramsListQuery);
-        const programsListQuery = result[0];
-        const programs = programsListQuery.map((item) => item.name);
+        const programs = await getProgramsListFromDB(db);
 
         res.status(200).json({ titles: programs });
       } else if (selected) {

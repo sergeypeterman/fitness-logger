@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { exercise, trainingRecord, TAGSTYLE, BUTTONSTYLE } from "./constants";
+import { useRef, useState } from "react";
+import { TAGSTYLE } from "./constants";
 import { checkIntegerRange } from "./functions";
 
 export function Exercises({ workout, updateWorkout, updateError, error }) {
@@ -19,10 +19,7 @@ export function Exercises({ workout, updateWorkout, updateError, error }) {
       {workout.exercises.map((item, ind) => {
         return (
           <div name="exercises" className="flex flex-row w-full " key={ind}>
-            <label
-              htmlFor={`exercise-${ind}`}
-              className={`${TAGSTYLE} w-2/3 `}
-            >
+            <label htmlFor={`exercise-${ind}`} className={`${TAGSTYLE} w-2/3 `}>
               {item.name}
             </label>
             <ExerciseValue
@@ -49,7 +46,7 @@ function ExerciseValue({
   name,
   updateError,
   error,
-  id
+  id,
 }) {
   const [exerciseValue, setExerciseValue] = useState(workload);
 
@@ -104,7 +101,7 @@ function ExerciseValue({
     <input
       name={`exercise-${ind}-${name}`}
       type="number"
-      placeholder = "0-999"
+      placeholder="0-999"
       value={exerciseValue}
       className={`${buttonStyle} bg-sky-700 hover:bg-sky-900 w-1/3`}
       onChange={(e) => handleExerciseValue(e)}

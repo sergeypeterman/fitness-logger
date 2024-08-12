@@ -1,38 +1,7 @@
 import { useEffect, useRef } from "react";
-import { exercise, trainingRecord, TAGSTYLE, BUTTONSTYLE } from "./constants";
-import { checkDate, checkIntegerRange } from "./functions";
+import { TAGSTYLE } from "./constants";
+import { checkDate, checkIntegerRange, PopulateWorkout } from "./functions";
 import "./functions";
-
-function PopulateWorkout(wout, headers, values) {
-  const newWorkout = { ...wout };
-  // resetting exercises to avoid duplicating
-  if (headers.length > 0) {
-    newWorkout.exercises.length = 0;
-  }
-  //populating workout with the exercises' data and a new id
-  headers.map((item, ind) => {
-    if (ind === 0) {
-      // id
-      newWorkout.id = Number(values[0]) + 1; // new id
-      console.log("new id: " + newWorkout.id);
-    } else if (ind === 1) {
-      /* date. Skipping old date 
-          let oldDate = new Date(values[1]).toLocaleDateString("fr-ca");
-          newWorkout.date = oldDate; */
-    } else if (ind === 2 && values[2] !== 0) {
-      // reps
-      //checking for 0 because it can't be 0
-      newWorkout.reps = values[2]; //skipping old reps
-    } else if (ind === 3) {
-      // rest
-      newWorkout.rest = values[3]; //skipping old rest
-    } else if (ind > 3) {
-      let ex = new exercise(item, values[ind]);
-      newWorkout.exercises.push(ex);
-    }
-  });
-  return newWorkout;
-}
 
 export function Settings({
   workout,
@@ -58,7 +27,7 @@ export function Settings({
 
   //loading default program
   useEffect(() => {
-    if (isFetched === 0 || isFetched === 2) {
+    if (isFetched === 2) {
       updateLoading(true); //loading...
       console.log(`sent from settings: ${selectedProgram}`);
       fetch(`/api/workouts-db?selected=${selectedProgram}`, {
@@ -240,12 +209,9 @@ export function Settings({
       //omitting date, reps and rest
 
       updateLoading(true); //loading...
-      const response = await fetch(
-        `/api/workouts-db?selected=${newProgram}`,
-        {
-          method: "GET",
-        }
-      );
+      const response = await fetch(`/api/workouts-db?selected=${newProgram}`, {
+        method: "GET",
+      });
       if (!response.ok) {
         console.log(response.statusText);
         throw new Error(response.statusText);

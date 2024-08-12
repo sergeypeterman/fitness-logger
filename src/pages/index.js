@@ -1,70 +1,58 @@
 import { Fragment, useEffect, useState } from "react";
 import { Settings } from "../components/settings";
-import {
-  exercise,
-  trainingRecord,
-  TAGSTYLE,
-  BUTTONSTYLE,
-} from "../components/constants";
+import { trainingRecord } from "../components/constants";
 import { Button } from "@/components/button.js";
 import { Exercises } from "@/components/exercises";
 import "@/components/";
+import {
+  getNewestSelectedWorkoutFromDB,
+  getProgramsListFromDB,
+  PopulateWorkout,
+} from "@/components/functions";
 
 //////////////////////***************************************/
 const today = new Date().toLocaleDateString("fr-ca");
-const initialWorkout = new trainingRecord(-1, today, "2x15", 120, []);
+//const initialWorkout = new trainingRecord(-1, today, "2x15", 120, []);
 
 //////////////////////***************************************/
 
-export default function Home() {
+export async function getServerSideProps() {
+  const mysql = await import("mysql2/promise");
+  const db = await mysql.createConnection({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_SCHEME,
+  });
+
+  const programs = await getProgramsListFromDB(db);
+
+  const readAttempt = await getNewestSelectedWorkoutFromDB(db, programs[0]);
+  const wout = new trainingRecord(-1, today, "2x15", 120, []);
+  const initialWorkout = PopulateWorkout(
+    wout,
+    readAttempt.data.headers,
+    readAttempt.data.values
+  );
+
+  return {
+    props: {
+      programs: programs,
+      selProgram: programs[0],
+      initialWorkout: initialWorkout,
+    },
+  };
+
+}
+
+export default function Home({ programs, selProgram, initialWorkout }) {
   const [error, setError] = useState(false);
   const [workout, setWorkout] = useState(initialWorkout);
-  const [fetched, setFetched] = useState(0); // 0=initial, 1=fetched last, 2=posted
+  const [fetched, setFetched] = useState(1); // 0=initial, 1=fetched last, 2=posted
   const [isLoading, setLoading] = useState(false);
-  const [program, setProgram] = useState([]);
-  const [selectedProgram, setSelectedProgram] = useState("");
-
-  useEffect(() => {
-    // encoding 'initial' to base64 to prevent confusion in case there is a Program
-    //that is called "initial" by the user
-    if (fetched === 0) {
-      console.log("loading from Home (initial)");
-      let resError;
-
-      const initial = Buffer.from("initial").toString("base64");
-      setLoading(true);
-      fetch(`/api/workouts-db?selected=${initial}`, {
-        method: "GET",
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          const { titles } = data;
-          if (titles) {
-            setProgram(titles);
-            setSelectedProgram(titles[0]);
-            console.log(titles);
-            setError(false);
-          } else {
-            console.log(data);
-            resError = new String(data);
-            setError({
-              error: true,
-              message: resError,
-            });
-            setLoading(false);
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-          setLoading(false);
-          setError({
-            error: true,
-            message: error.message,
-          });
-        });
-      setLoading(false);
-    }
-  }, [fetched]);
+  const [program, setProgram] = useState(programs);
+  const [selectedProgram, setSelectedProgram] = useState(selProgram);
 
   const updateError = (err) => {
     err ? setError({ error: true, message: err }) : setError(err);

@@ -1,3 +1,5 @@
+import { exercise } from "./constants";
+
 export function validateDateString(year, month, day) {
   // checking if the date exists. Eg Feb 30, Apr 31 and so on,
   let y = Number(year);
@@ -466,4 +468,44 @@ export async function getNewestSelectedWorkoutFromDB(db, selected) {
   } finally {
     return readAttempt;
   }
+}
+
+export async function getProgramsListFromDB(db) {
+  const getProgramsListQuery = `SELECT name FROM programs`;
+  const result = await db.query(getProgramsListQuery);
+  const programsListQuery = result[0];
+  const programs = programsListQuery.map((item) => item.name);
+
+  return programs;
+}
+
+export function PopulateWorkout(wout, headers, values) {
+  const newWorkout = { ...wout };
+  // resetting exercises to avoid duplicating
+  if (headers.length > 0) {
+    newWorkout.exercises.length = 0;
+  }
+  //populating workout with the exercises' data and a new id
+  headers.map((item, ind) => {
+    if (ind === 0) {
+      // id
+      newWorkout.id = Number(values[0]) + 1; // new id
+      console.log("new id: " + newWorkout.id);
+    } else if (ind === 1) {
+      /* date. Skipping old date 
+          let oldDate = new Date(values[1]).toLocaleDateString("fr-ca");
+          newWorkout.date = oldDate; */
+    } else if (ind === 2 && values[2] !== 0) {
+      // reps
+      //checking for 0 because it can't be 0
+      newWorkout.reps = values[2]; //skipping old reps
+    } else if (ind === 3) {
+      // rest
+      newWorkout.rest = values[3]; //skipping old rest
+    } else if (ind > 3) {
+      let ex = { name: item, workload: values[ind] };
+      newWorkout.exercises.push(ex);
+    }
+  });
+  return newWorkout;
 }

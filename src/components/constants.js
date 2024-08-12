@@ -1,7 +1,7 @@
-export function exercise(name, workload) {
+/* export function exercise(name, workload) {
   this.name = name;
   this.workload = workload;
-}
+} */
 
 export class trainingRecord {
   constructor(id, date, reps, rest, exercises = []) {
