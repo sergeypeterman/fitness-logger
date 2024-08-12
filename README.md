@@ -1,4 +1,4 @@
-As a frontend developer with a passion for fitness, I have created a pet-project on GitHub using Next.js and React to simplify the process of tracking my workouts. The project now employs MySQL running at Oracle Cloud as a database instead of Google Sheets. This change has allowed to speed up the app 3x and opened possibilities for more agile logging of my workouts, as well as to easily get a list of latest workouts.
+As a frontend developer with a passion for fitness, I have created a pet-project on GitHub using Next.js and React to simplify the process of tracking my workouts. The app is deployed and running on Vercel. The project now employs MySQL running at Oracle Cloud as a database instead of Google Sheets. This change has allowed to speed up the app 3x and opened possibilities for more agile logging of my workouts, as well as to easily get a list of latest workouts.
 
 The application has unit tests that cover some but not all of its functionality. These tests were written using the Jest testing framework. 
 
