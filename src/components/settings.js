@@ -292,13 +292,12 @@ export function Settings({
   };
 
   return (
-    <div name="settings" className="w-full">
+    <div id="settings" className="w-full">
       <div className="flex flex-row ">
         <label htmlFor="program-selector" className={tagStyle}>
           Program
         </label>
         <select
-          type="text"
           name="programSelector"
           id="program-selector"
           onChange={handleProgram}

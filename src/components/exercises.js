@@ -18,7 +18,7 @@ export function Exercises({ workout, updateWorkout, updateError, error }) {
     <div>
       {workout.exercises.map((item, ind) => {
         return (
-          <div name="exercises" className="flex flex-row w-full " key={ind}>
+          <div id="exercises" className="flex flex-row w-full " key={ind}>
             <label htmlFor={`exercise-${ind}`} className={`${TAGSTYLE} w-2/3 `}>
               {item.name}
             </label>
