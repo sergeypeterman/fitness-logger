@@ -10,9 +10,7 @@ import {
   PopulateWorkout,
 } from "@/components/functions";
 
-//////////////////////***************************************/
 const today = new Date().toLocaleDateString("fr-ca");
-//////////////////////***************************************/
 
 export async function getServerSideProps() {
   const mysql = await import("mysql2/promise");
@@ -24,24 +22,26 @@ export async function getServerSideProps() {
     database: process.env.DB_SCHEME,
   });
 
-  const programs = await getProgramsListFromDB(db);
-
-  const readAttempt = await getNewestSelectedWorkoutFromDB(db, programs[0]);
+  const readAttempt = await getNewestSelectedWorkoutFromDB(db, null);
   const wout = new trainingRecord(-1, today, "2x15", 120, []);
   const initialWorkout = PopulateWorkout(
     wout,
     readAttempt.data.headers,
     readAttempt.data.values
   );
+  console.log("API readAttempt: ", readAttempt);
+
+  //const listWorkoutsQuery = `SELECT * FROM workouts ORDER BY date DESC`;
+
+  db.end();
 
   return {
     props: {
-      programs: programs,
-      selProgram: programs[0],
+      programs: readAttempt.allPrograms,
+      selProgram: readAttempt.selectedProgram,
       initialWorkout: initialWorkout,
     },
   };
-
 }
 
 export default function Home({ programs, selProgram, initialWorkout }) {

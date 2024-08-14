@@ -428,14 +428,21 @@ export async function getNewestSelectedWorkoutFromDB(db, selected) {
   const readAttempt = { success: false };
 
   try {
-    //getting default program settings (sets, reps, rest)
-    const programSettings = await getProgramSettingsfromDB(db, {
-      program: selected,
-    });
+    let getProgramIDQuery;
+    if (selected == null) {
+      getProgramIDQuery = `SELECT w.*, p.name AS program_name, 
+      (SELECT GROUP_CONCAT(name SEPARATOR ',') FROM programs) AS all_programs FROM workouts w 
+      INNER JOIN programs p ON w.program = p.id ORDER BY w.date DESC LIMIT 1;`;
+    } else {
+      getProgramIDQuery = `SELECT w.*, p.name AS program_name, 
+      (SELECT GROUP_CONCAT(name SEPARATOR ',') FROM programs) AS all_programs FROM workouts w 
+      INNER JOIN programs p ON w.program = p.id AND p.name = '${selected}' ORDER BY date DESC LIMIT 1`;
+    }
+
     //getting exercises list from the last actual workout with this program
-    const getProgramIDQuery = `SELECT * FROM workouts WHERE program = ${programSettings.id} ORDER BY date DESC LIMIT 1`;
     const result = await db.query(getProgramIDQuery);
     const newestWorkout = result[0][0];
+    console.log("API newest workout: ", newestWorkout);
 
     //filling data in
     const data = {};
@@ -447,8 +454,8 @@ export async function getNewestSelectedWorkoutFromDB(db, selected) {
     data.values = [
       newestWorkout.id,
       workoutDate,
-      `${programSettings.sets}x${programSettings.reps}`,
-      programSettings.rest,
+      `${newestWorkout.program_settings.sets}x${newestWorkout.program_settings.reps}`,
+      newestWorkout.program_settings.rest,
     ];
 
     //transforming id-s to names
@@ -461,6 +468,8 @@ export async function getNewestSelectedWorkoutFromDB(db, selected) {
     }
     readAttempt.success = true;
     readAttempt.data = data;
+    readAttempt.allPrograms = newestWorkout.all_programs.split(',');
+    readAttempt.selectedProgram = newestWorkout.program_name;
   } catch (error) {
     readAttempt.success = false;
     readAttempt.data = data;
