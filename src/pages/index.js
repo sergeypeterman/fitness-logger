@@ -6,7 +6,6 @@ import { Exercises } from "@/components/exercises";
 import "@/components/";
 import {
   getNewestSelectedWorkoutFromDB,
-  getProgramsListFromDB,
   PopulateWorkout,
 } from "@/components/functions";
 
@@ -29,9 +28,6 @@ export async function getServerSideProps() {
     readAttempt.data.headers,
     readAttempt.data.values
   );
-  console.log("API readAttempt: ", readAttempt);
-
-  //const listWorkoutsQuery = `SELECT * FROM workouts ORDER BY date DESC`;
 
   db.end();
 

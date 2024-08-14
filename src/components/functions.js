@@ -439,10 +439,9 @@ export async function getNewestSelectedWorkoutFromDB(db, selected) {
       INNER JOIN programs p ON w.program = p.id AND p.name = '${selected}' ORDER BY date DESC LIMIT 1`;
     }
 
-    //getting exercises list from the last actual workout with this program
+    //getting last actual workout with all the data joined
     const result = await db.query(getProgramIDQuery);
     const newestWorkout = result[0][0];
-    console.log("API newest workout: ", newestWorkout);
 
     //filling data in
     const data = {};
