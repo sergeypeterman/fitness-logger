@@ -30,7 +30,7 @@ export function Settings({
     if (isFetched === 2) {
       updateLoading(true); //loading...
       console.log(`sent from settings: ${selectedProgram}`);
-      fetch(`/api/workouts-db?selected=${selectedProgram}`, {
+      fetch(`/api/workouts-db/?selected=${selectedProgram}&requestType=latest`, {
         method: "GET",
       })
         .then((response) => response.json())
@@ -209,7 +209,8 @@ export function Settings({
       //omitting date, reps and rest
 
       updateLoading(true); //loading...
-      const response = await fetch(`/api/workouts-db?selected=${newProgram}`, {
+
+      const response = await fetch(`/api/workouts-db?selected=${newProgram}&requestType=latest`, {
         method: "GET",
       });
       if (!response.ok) {

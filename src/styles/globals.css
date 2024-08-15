@@ -28,19 +28,27 @@ body {
 }
 
 @layer base {
-  input[type='number']::-webkit-outer-spin-button,
-  input[type='number']::-webkit-inner-spin-button,
-  input[type='number'] {
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"] {
     -webkit-appearance: none;
     -moz-appearance: textfield !important;
   }
-  input[type="date"]
-{
-    display:block;
+  input[type="date"] {
+    display: block;
     -webkit-appearance: textfield;
     -moz-appearance: textfield;
     min-height: 1.2em;
+  }
 }
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
 }
-
-

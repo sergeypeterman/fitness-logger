@@ -8,6 +8,8 @@ import {
   getNewestSelectedWorkoutFromDB,
   PopulateWorkout,
 } from "@/components/functions";
+import WorkoutsButton from "@/components/workouts-button";
+import WorkoutsHistory from "@/components/workout-history";
 
 const today = new Date().toLocaleDateString("fr-ca");
 
@@ -47,6 +49,7 @@ export default function Home({ programs, selProgram, initialWorkout }) {
   const [isLoading, setLoading] = useState(false);
   const [program, setProgram] = useState(programs);
   const [selectedProgram, setSelectedProgram] = useState(selProgram);
+  const [showHistory, setShowHistory] = useState(false);
 
   const updateError = (err) => {
     err ? setError({ error: true, message: err }) : setError(err);
@@ -139,7 +142,7 @@ export default function Home({ programs, selProgram, initialWorkout }) {
   };
 
   return (
-    <main className="h-screen relative overflow-auto flex flex-col m-auto w-full">
+    <main className="h-screen relative flex flex-col m-auto w-full">
       <div className="static">
         <p
           className={
@@ -151,61 +154,73 @@ export default function Home({ programs, selProgram, initialWorkout }) {
           {!error && fetched === 2 ? "Logged successfully" : null}
         </p>
       </div>
-      <div
-        id="widget"
-        className="max-w-lg min-w-[353px] box-border shadow-xl flex flex-col p-5 m-auto border-slate-400 border-2 rounded-2xl border-solid"
-      >
-        <div id="logo" className="font-header text-5xl m-auto ">
-          FITNESS LOGGER
-        </div>
-        <div className={error ? null : "invisible"}>
-          <p
-            className="m-auto h-6 w-3/4 flex justify-center items-center
+      <div className="h-auto  max-h-full max-w-lg min-w-[353px] md:min-w-[512px] flex flex-col m-auto w-full p-5 border-slate-400 border-2 rounded-2xl border-solid shadow-xl flex flex-col ">
+        <div id="widget" className="overflow-auto flex flex-col no-scrollbar ">
+          <WorkoutsHistory
+            showHistory={showHistory}
+            setShowHistory={setShowHistory}
+            fetched={fetched}
+          />
+          <div className={`${!showHistory ? null : "hidden"} flex flex-col`}>
+            <div id="logo" className="font-header text-5xl m-auto ">
+              FITNESS LOGGER
+            </div>
+            <div className={error ? null : "invisible"}>
+              <p
+                className="m-auto h-6 w-3/4 flex justify-center items-center
           border-rose-300 text-rose-600 border-2 rounded-md border-solid"
-          >
-            {error ? String(error.message) : null}
-          </p>
-        </div>
-        {selectedProgram && (
-          <Settings
-            workout={workout}
-            updateWorkout={updateWorkout}
-            program={program}
-            selectedProgram={selectedProgram}
-            updateSelectedProgram={updateSelectedProgram}
-            isLoading={isLoading}
-            updateLoading={setLoading}
-            updateFetched={updateFetched}
-            error={error}
-            updateError={updateError}
-            resetWorkout={resetWorkout}
-            isFetched={fetched}
-          />
-        )}
+              >
+                {error ? String(error.message) : null}
+              </p>
+            </div>
+            {selectedProgram && (
+              <Settings
+                workout={workout}
+                updateWorkout={updateWorkout}
+                program={program}
+                selectedProgram={selectedProgram}
+                updateSelectedProgram={updateSelectedProgram}
+                isLoading={isLoading}
+                updateLoading={setLoading}
+                updateFetched={updateFetched}
+                error={error}
+                updateError={updateError}
+                resetWorkout={resetWorkout}
+                isFetched={fetched}
+              />
+            )}
 
-        <Fragment>
-          <Exercises
-            workout={workout}
-            updateWorkout={updateWorkout}
-            updateError={updateError}
-            error={error}
-          />
-          <div className="flex w-full">
-            <Button
-              buttonCaption={
-                error ? <div>{String(error.message)}</div> : "Add new Workout"
-              }
-              isLoading={isLoading}
-              onClickHandler={handlePost}
-              loadingCaption={
-                error ? <div>{String(error.message)}</div> : "Loading Workout"
-              }
-              error={error}
-              isFetched={fetched}
-              buttonId="submit"
-            />
+            <Fragment>
+              <Exercises
+                workout={workout}
+                updateWorkout={updateWorkout}
+                updateError={updateError}
+                error={error}
+              />
+              <div className="flex w-full justify-center">
+                <WorkoutsButton
+                  className="flex w-1/2"
+                  showHistory={showHistory}
+                  setShowHistory={setShowHistory}
+                />
+                <Button
+                  className="flex w-1/2"
+                  buttonCaption={
+                    error ? <div>{String(error.message)}</div> : "Add new"
+                  }
+                  isLoading={isLoading}
+                  onClickHandler={handlePost}
+                  loadingCaption={
+                    error ? <div>{String(error.message)}</div> : "Loading"
+                  }
+                  error={error}
+                  isFetched={fetched}
+                  buttonId="submit"
+                />
+              </div>
+            </Fragment>
           </div>
-        </Fragment>
+        </div>
       </div>
     </main>
   );

@@ -57,41 +57,50 @@ export default async function useMysqlDB(req, res) {
     // ****************
     else if (req.method == "GET") {
       const {
-        query: { selected },
+        query: { selected, requestType },
       } = req;
 
-      //reading encoded word 'initial'
-      const isInitial = Buffer.from("initial").toString("base64");
+      console.log(req.query);
+      console.log(requestType);
+      console.log(selected);
 
-      if (selected == isInitial) {
-        //if it's an initial request (react state "fetched" = 0)
-        //reading existing programs and returning their names in array 'titles'
-        //after that in Settings component we're selecting the first one [0] <-- this should be rewrited
+      if (requestType === "latest") {
+        if (selected) {
+          //if it's an actual data request
+          //for the program with <selected> program name we're getting newest workout' data
+          const readAttempt = await getNewestSelectedWorkoutFromDB(
+            db,
+            selected
+          );
 
-        const programs = await getProgramsListFromDB(db);
-
-        res.status(200).json({ titles: programs });
-      } else if (selected) {
-        //if it's an actual data request
-        //for the program with <selected> program name we're getting newest workout' data
-        const readAttempt = await getNewestSelectedWorkoutFromDB(db, selected);
-
-        //sending the read values to frontend
-        if (readAttempt.success) {
-          res.status(200).json({
-            headers: readAttempt.data.headers,
-            values: readAttempt.data.values,
-          });
+          //sending the read values to frontend
+          if (readAttempt.success) {
+            res.status(200).json({
+              headers: readAttempt.data.headers,
+              values: readAttempt.data.values,
+            });
+          } else {
+            //if there are only initial headers, return error
+            res.status(500).end("Not enough data in the sheet");
+          }
         } else {
-          //if there are only initial headers, return error
-          res.status(500).end("Not enough data in the sheet");
+          res.status(400).end(`Unknown Program selected`);
         }
-      } else {
-        res.status(400).end(`Unknown Program selected`);
+      } else if (requestType === "list") {
+        //console.log("api-hi");
+
+        const latestWorkoutsListQuery = `SELECT program, DATE_FORMAT(date, '%M %d,%Y') AS formatted_date, program_settings, name FROM workouts
+                                          inner join programs on workouts.program = programs.id
+                                          order by date desc`;
+        const result = await db.query(latestWorkoutsListQuery);
+        const latestWorkoutsList = result[0];
+        //console.log(latestWorkoutsList);
+        
+        res.status(200).json({ workoutHistory: latestWorkoutsList });
       }
     } else {
       //in case it's not either GET or POST
-      res.status(400).end(`${req.method} Not Allowed`);
+      res.status(400).end(`${req.method} or type are Not Allowed`);
     }
   } catch (err) {
     console.log("error api " + err + err.code);
