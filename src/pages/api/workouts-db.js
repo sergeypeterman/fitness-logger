@@ -89,7 +89,7 @@ export default async function useMysqlDB(req, res) {
       } else if (requestType === "list") {
         //console.log("api-hi");
 
-        const latestWorkoutsListQuery = `SELECT program, DATE_FORMAT(date, '%M %d,%Y') AS formatted_date, program_settings, name FROM workouts
+        const latestWorkoutsListQuery = `SELECT program, DATE_FORMAT(date, '%b %d,%Y') AS formatted_date, program_settings, name FROM workouts
                                           inner join programs on workouts.program = programs.id
                                           order by date desc`;
         const result = await db.query(latestWorkoutsListQuery);

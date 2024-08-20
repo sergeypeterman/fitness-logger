@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { TAGSTYLE } from "./constants";
+import { BUTTONSTYLE, TAGSTYLE } from "./constants";
 import { checkIntegerRange } from "./functions";
 
 export function Exercises({ workout, updateWorkout, updateError, error }) {
@@ -53,7 +53,7 @@ function ExerciseValue({
   //useEffect(setExerciseValue(workload),[workload]);
 
   const exRef = useRef();
-  const buttonStyle = "text-center px-5 py-3 m-1 text-white rounded-lg text-lg";
+  const buttonStyle = `${BUTTONSTYLE}`;
 
   const handleExerciseValue = (event) => {
     const num = event.target.value;

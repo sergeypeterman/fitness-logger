@@ -168,7 +168,7 @@ export default function Home({ programs, selProgram, initialWorkout }) {
             <div className={error ? null : "invisible"}>
               <p
                 className="m-auto h-6 w-3/4 flex justify-center items-center
-          border-rose-300 text-rose-600 border-2 rounded-md border-solid"
+                           border-rose-300 text-rose-600 border-2 rounded-md border-solid"
               >
                 {error ? String(error.message) : null}
               </p>

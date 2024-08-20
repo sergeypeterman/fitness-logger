@@ -24,7 +24,7 @@ export default function WorkoutsHistory({ showHistory, setShowHistory,fetched })
           return (
             <div
               id={`history-block-${ind}`}
-              className={`flex flex-row justify-between w-full ${TAGSTYLE} mx-auto`}
+              className={`flex flex-row justify-between w-full ${TAGSTYLE} mx-auto text-base`}
               key={`history-block-${ind}`}
             >
               <p className="px-3">{item["formatted_date"]}</p>
@@ -35,7 +35,7 @@ export default function WorkoutsHistory({ showHistory, setShowHistory,fetched })
       </div>
       <button
         onClick={() => setShowHistory(false)}
-        className={`${BUTTONSTYLE} w-full sticky bottom-0 mx-auto drop-shadow-sm`}
+        className={`${BUTTONSTYLE} m-1 w-full sticky bottom-0 mx-auto drop-shadow-sm`}
       >
         Close
       </button>

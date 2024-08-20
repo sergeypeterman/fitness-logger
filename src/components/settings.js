@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { TAGSTYLE } from "./constants";
+import { BUTTONSTYLE, TAGSTYLE } from "./constants";
 import { checkDate, checkIntegerRange, PopulateWorkout } from "./functions";
 import "./functions";
 
@@ -241,11 +241,9 @@ export function Settings({
   const setRep = workout.reps.split("x"); //extracting sets and reps to an array
 
   // setting styles for the elements
-  const buttonStyle = "text-center px-5 py-3 m-1 text-white rounded-lg text-lg";
-  const tagStyle = false
-    ? "bg-gray-300 w-1/3 text-center px-5 py-3 m-1 text-black rounded-lg font-display text-lg"
-    : `${TAGSTYLE} w-1/3`;
-  const smButtonStyle = `text-center px-5 py-3 w-1/2 text-white rounded-lg text-lg`;
+  const buttonStyle = `${BUTTONSTYLE}`;
+  const tagStyle = `${TAGSTYLE} w-1/3`;
+  const smButtonStyle = `${BUTTONSTYLE} w-1/2`;
 
   const handleRest = (event) => {
     //handling Rest input
@@ -327,13 +325,13 @@ export function Settings({
         />
       </div>
       <form className="flex flex-row">
-        <label id="repsSetsSelector" className={`${tagStyle}`}>
+        <label id="repsSetsSelector" className={`${tagStyle} mr-2`}>
           Reps x Sets
         </label>
-        <div className="flex flex-row justify-between w-2/3 m-1">
+        <div className="flex flex-row justify-between w-2/3">
           <input
             name="setsSelector"
-            className={`${smButtonStyle} bg-sky-700 hover:bg-sky-900 mr-1`}
+            className={`${smButtonStyle} bg-sky-700 hover:bg-sky-900 mr-1 ml-0`}
             type="number"
             value={setRep[0]}
             placeholder="0-99"
