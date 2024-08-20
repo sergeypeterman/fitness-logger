@@ -154,7 +154,7 @@ export default function Home({ programs, selProgram, initialWorkout }) {
           {!error && fetched === 2 ? "Logged successfully" : null}
         </p>
       </div>
-      <div className="h-auto max-h-[100svh] max-w-lg min-w-[353px] md:min-w-[512px] flex flex-col m-auto w-full p-5 border-slate-400 border-2 rounded-2xl border-solid shadow-xl flex flex-col ">
+      <div className="h-auto max-h-[100svh] max-w-lg min-w-[353px] md:min-w-[512px] flex flex-col mx-auto md:m-auto w-full p-5 border-slate-400 border-2 rounded-2xl border-solid shadow-xl flex flex-col ">
         <div id="widget" className="overflow-auto flex flex-col no-scrollbar ">
           <WorkoutsHistory
             showHistory={showHistory}
